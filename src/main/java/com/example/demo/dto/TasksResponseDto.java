@@ -11,7 +11,7 @@ public class TasksResponseDto {
 	private String description;
 	private String priority;
 	private LocalDate due_date;
-	private String Status;
+	private String status;
 	private String visibility;
 	private LocalDateTime created_at;
 	
@@ -53,10 +53,10 @@ public class TasksResponseDto {
 		this.due_date = due_date;
 	}
 	public String getStatus() {
-		return Status;
+		return status;
 	}
 	public void setStatus(String status) {
-		Status = status;
+		this.status = status;
 	}
 	public String getVisibility() {
 		return visibility;

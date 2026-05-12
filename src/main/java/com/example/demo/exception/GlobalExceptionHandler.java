@@ -10,8 +10,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.demo.dto.ErrorResponse;
+
 @RestControllerAdvice
-public class GlorbalExceptionHandler {
+public class GlobalExceptionHandler {
 	
 	//------------- @validのバリデーションエラー --------------------
 	@ExceptionHandler(MethodArgumentNotValidException.class)

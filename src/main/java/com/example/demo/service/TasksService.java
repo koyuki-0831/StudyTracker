@@ -73,7 +73,7 @@ public class TasksService {
 		
 		//デフォルト
 		if(model.getVisibility() == null || model.getVisibility().isBlank()) {
-			model.setVisibility("PUBLIC");
+			model.setVisibility("Public");
 		}
 		
 		TasksModel saved = tasksRepository.save(model);
@@ -107,7 +107,7 @@ public class TasksService {
 		
 		//念の為のvisibilityのデフォルト制御
 		if(tasks.getVisibility() == null || tasks.getVisibility().isBlank()) {
-			tasks.setVisibility("PUBLIC");
+			tasks.setVisibility("Public");
 		}
 		
 		TasksModel saved = tasksRepository.save(tasks);
@@ -143,8 +143,8 @@ public class TasksService {
 		if("高".equals(dto.getPriority()) && dto.getDue_date() == null) {
 			throw new IllegalArgumentException("優先度が「高」の場合は期限必須です");
 		}
-		if(dto.getVisibility() != null && !List.of("PUBLIC","PRIVATE").contains(dto.getVisibility())) {
-			throw new IllegalArgumentException("visibility は PUBLIC / PRIVATE のみです");
+		if(dto.getVisibility() != null && !List.of("Public","Private").contains(dto.getVisibility())) {
+			throw new IllegalArgumentException("visibility は Public / Private のみです");
 		}
 	}
 	

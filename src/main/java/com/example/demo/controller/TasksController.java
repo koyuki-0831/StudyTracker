@@ -40,7 +40,7 @@ public class TasksController {
 			@RequestParam (defaultValue = "0") int page,
 			@RequestParam (defaultValue = "10") int size,
 			@RequestParam (defaultValue = "created_at") String sortBy,
-			@RequestParam (defaultValue = "desc") String derection
+			@RequestParam (defaultValue = "desc") String direction
 	) {
 		Page<TasksResponseDto> result = tasksService.getTasks(
 				userId,
@@ -51,14 +51,14 @@ public class TasksController {
 				page,
 				size,
 				sortBy,
-				derection
+				direction
 		);
 		
 		return ResponseEntity.ok(result);
 	}
 	
 	//タスク新規作成
-	@PostMapping("/users/{userId}")
+	@PostMapping("/create/{userId}")
 	public ResponseEntity<TasksResponseDto> createTasks(
 			@PathVariable String userId,
 			@Valid @RequestBody TasksRequestDto dto
@@ -71,7 +71,7 @@ public class TasksController {
 	
 	
 	//タスク更新
-	@PutMapping("/{id}")
+	@PutMapping("/{userId}/{id}")
 	public ResponseEntity<TasksResponseDto> updateTasks(
 			@PathVariable Long id,
 			@RequestParam String userId,
@@ -84,7 +84,7 @@ public class TasksController {
 	}
 	
 	//タスク削除
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/{userId}/{id}")
 	public ResponseEntity<Void> deleteTasks(
 			@PathVariable Long id,
 			@RequestParam String userId

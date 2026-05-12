@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
+@Table(name = "tasks_model")
 public class TasksModel {
 	
 	@Column(nullable = false)
@@ -33,7 +35,7 @@ public class TasksModel {
 	@NotBlank
 	private String priority;
 	@JsonProperty("due_date")
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy/MM/dd")
 	private LocalDate due_date;
 	private String status;
 	private String visibility;
