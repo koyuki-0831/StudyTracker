@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>タスク検索（更新/削除用）</title>
+<style>
+
+body {
+    min-height: 100%;
+    margin: 0;
+
+    font-family: sans-serif;
+
+    background-color: #fcfcf8;
+
+    background-image: 
+        radial-gradient(
+            circle,
+            #d8d8d8 0.8px, 
+            transparent 1px
+        ),
+        
+        linear-gradient(
+            to bottom, 
+            transparent 13px, 
+            #e5e5e5 14px
+        );
+
+    background-size:
+            14px 14px,
+            100% 14px;
+                    
+    background-position: 
+            0 7px, 
+            0 0;
+
+    transition: transform 0.5s ease, ocpcity 0.5s ease;
+    transform-origin: left center;
+}
+
+main {
+    padding: 20px 40px 40px;
+
+    text-align: center;
+}
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin: 0 0 40px;
+    z-index: 1;
+}
+
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(225, 225, 0, 0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
+}
+
+.search-form {
+    width: 520px;
+    margin: 0 auto;
+    padding: 32px;
+    background-color: rgba(225, 225, 0, 0.88);
+    border-radius: 10px;
+    box-shadow: 4px 6px 10px
+                rgba(225, 225, 0, 0.15);
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label{
+    display: block;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #001e43;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #c8c8c8;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 40px;
+}
+
+.menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    min-height: 54px;
+    padding: 12px 20px;
+    background-color: #a59aca;
+    color: #001e43;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 4px 6px 8px
+                rgba(0, 0,  0, 0.18);
+    transition: 0.2s;
+}
+ 
+.menu-button:hover {
+    transform: translateY(-4px);
+    box-shadow: 6px 10px 14px
+                rgba(225, 225, 0, 0.22);
+}
+
+</style>
+</head>
+<body>
+<div th:replace= "~{header :: header}"></div>
+
+<main>
+
+    <h1 class="page-title">
+        タスク検索
+    </h1>
+
+    <form id="searchForm" class="search-form">
+        <div class="form-group">
+            <label>キーワード</label>
+
+            <input type="text" id="keyword" placeholder="タイトル・詳細検索">
+        </div>
+
+        <div class="form-group">
+            <label>優先度</label>
+            <select id="priority">
+                <option value="">
+                    指定なし
+                </option>
+
+                <option value="低">
+                    低
+                </option>
+
+                <option value="中">
+                    中
+                </option>
+
+                <option value="高">
+                    高
+                </option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+
+            <label>
+                ステータス
+            </label>
+
+            <select id="status">
+
+                <option value="">
+                    指定なし
+                </option>
+
+                <option value="未着手">
+                    未着手
+                </option>
+
+                <option value="進行中">
+                    進行中
+                </option>
+
+                <option value="完了">
+                    完了
+                </option>
+            </select>
+        </div>
+
+        <div class="button-area">
+            <button type="submit" class="menu-button">
+                検索
+            </button>
+
+            <a th:href="@{/tasks-page}" class="menu-button">
+                戻る
+            </a>
+        </div>
+    </form>
+</main>
+<script>
+
+    document.getElementById("searchForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const params = new URLSearchParams(window.location.search);
+            const action =params.get("action");
+
+            const keyword = document.getElementById("keyword").value.trim();
+            const priority = document.getElementById("priority").value;
+            const status = document.getElementById("status").value;
+
+            if(!keyword && !priority && !status) {
+                alert("キーワード・優先度・ステータスのいずれかを入力してください");
+                return;
+            }
+
+            const searchCondition = {
+
+                action:action,
+                keyword:keyword,
+                priority:priority,
+                status:status
+            };
+
+            sessionStorage.setItem(
+                "taskSearchCondition",
+                JSON.stringify(searchCondition)
+            );
+
+            window.location.href =
+                "/tasks-search-result";
+        });
+</script>
+</body>
+
+</html>

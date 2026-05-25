@@ -14,6 +14,7 @@ public class TasksResponseDto {
 	private String status;
 	private String visibility;
 	private LocalDateTime created_at;
+	private LocalDateTime update_date;
 	
 	//-------getter / setter----------
 	public Long getId() {
@@ -69,6 +70,12 @@ public class TasksResponseDto {
 	}
 	public void setCreated_at(LocalDateTime created_at) {
 		this.created_at = created_at;
+	}
+	public LocalDateTime getUpdate_date() {
+		return update_date;
+	}
+	public void setUpdate_date(LocalDateTime update_date) {
+		this.update_date = update_date;
 	}
 	
 	

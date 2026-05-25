@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<style>
+
+    body {
+		min-height: 100%;
+        margin: 0;
+        font-family: sans-serif;
+
+        background-color: #fcfcf8;
+
+        background-image: 
+
+            /* ドット */
+			radial-gradient(
+				circle,
+			   	#d8d8d8 0.8px,
+			 	transparent 1px
+			),
+
+            /* 横罫線 */
+            linear-gradient(
+                to bottom,
+                transparent 13px,
+                #e5e5e5 14px
+            );
+
+            
+        /* ドット間隔 / 行間 */
+        background-size: 
+            14px 14px,
+            100% 14px;
+
+        background-position: 
+            0 7px,
+            0 0;
+
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        transform-origin: left center;
+    }
+
+    body.page-turn {
+        transform: rotateY(-12deg);
+        opacity: 0;
+    }
+
+    main {
+        padding: 40px;
+        text-align: center;
+    }
+
+    .menu-button {
+        display: inline-block;
+        width: 240px;
+        padding: 28px 20px;
+        margin: 24px;
+
+        background-color: #a59aca;
+        color: #001e43;
+
+        font-size: 22px;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+
+        border: none;
+        border-radius: 4px;
+
+        box-shadow: 
+            4px 6px 8px rgba(0, 0, 0, 0.18);
+
+        transform: rotate(-2deg);
+        transition: 0.2s;
+
+        position: relative;
+        overflow: hidden;
+    }
+
+    .menu-button:nth-child(2){
+        background-color: #c8f7c5;
+        transform: rotate(2deg);
+    }
+
+    .menu-button:hover {
+        transform: rotate(0deg) translateY(-6px);
+        box-shadow: 
+            6px 10px 14px rgba(0, 0, 0, 0.22);
+    }
+
+    .menu-button::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+
+        width: 28px;
+        height: 28px;
+
+        background: linear-gradient(
+            135deg,
+            rgba(0, 0, 0, 0.12),
+            rgba(255, 255, 255, 0.5)
+        );
+    }
+
+</style>
+<body>
+    <div th:replace="~{header :: header}"></div>
+    <main>
+        
+        <a th:href="@{/tasks-page}" class="menu-button">
+            ✏️学習タスク✏️
+        </a><br>
+        <a th:href="@{/studylogs-page}" class="menu-button">
+            📖学習記録📖
+        </a>
+        
+    </main>
+</body>
+<script>
+    document.querySelectorAll(".menu-button").forEach(button => {
+        button.addEventListener("click", function(event) {
+            event.preventDefault();
+
+            const url = this.getAttribute("href");
+
+            document.body.classList.add("page-turn");
+
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
+        });
+    });
+</script>
+</html>

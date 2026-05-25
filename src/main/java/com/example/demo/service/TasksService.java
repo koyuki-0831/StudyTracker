@@ -33,7 +33,8 @@ public class TasksService {
 			int page,
 			int size,
 			String sortBy,
-			String direction){
+			String direction
+	){
 		
 		//ソート生成
 		Sort sort = Sort.by(
@@ -73,7 +74,7 @@ public class TasksService {
 		
 		//デフォルト
 		if(model.getVisibility() == null || model.getVisibility().isBlank()) {
-			model.setVisibility("Public");
+			model.setVisibility("PUBLIC");
 		}
 		
 		TasksModel saved = tasksRepository.save(model);
@@ -101,14 +102,25 @@ public class TasksService {
 		// DTO → Model (上書き)
 		tasks.setTitle(dto.getTitle());
 		tasks.setDescription(dto.getDescription());
+		tasks.setStatus(dto.getStatus());
+		
+		if(dto.getStatus() == null || dto.getStatus().isBlank()) {
+			throw new IllegalArgumentException("進行度は必須です");
+		}
+		
+		if(!List.of("未着手", "進行中", "完了").contains(dto.getStatus())) {
+			throw new IllegalArgumentException("statusは 未着手 / 進行中 / 完了 のみです");
+		}
+		
 		tasks.setPriority(dto.getPriority());
 		tasks.setDue_date(dto.getDue_date());
 		tasks.setVisibility(dto.getVisibility());
 		
 		//念の為のvisibilityのデフォルト制御
 		if(tasks.getVisibility() == null || tasks.getVisibility().isBlank()) {
-			tasks.setVisibility("Public");
+			tasks.setVisibility("PUBLIC");
 		}
+		
 		
 		TasksModel saved = tasksRepository.save(tasks);
 		
@@ -143,8 +155,8 @@ public class TasksService {
 		if("高".equals(dto.getPriority()) && dto.getDue_date() == null) {
 			throw new IllegalArgumentException("優先度が「高」の場合は期限必須です");
 		}
-		if(dto.getVisibility() != null && !List.of("Public","Private").contains(dto.getVisibility())) {
-			throw new IllegalArgumentException("visibility は Public / Private のみです");
+		if(dto.getVisibility() != null && !List.of("PUBLIC","PRIVATE").contains(dto.getVisibility())) {
+			throw new IllegalArgumentException("visibility は PUBLIC / PRIVATE のみです");
 		}
 	}
 	
@@ -157,10 +169,12 @@ public class TasksService {
 		dto.setUserId(model.getUserId());
 		dto.setTitle(model.getTitle());
 		dto.setDescription(model.getDescription());
+		dto.setStatus(model.getStatus());
 		dto.setPriority(model.getPriority());
 		dto.setDue_date(model.getDue_date());
 		dto.setVisibility(model.getVisibility());
 		dto.setCreated_at(model.getCreated_at());
+		dto.setUpdate_date(model.getUpdate_date());
 		
 		return dto;
 		

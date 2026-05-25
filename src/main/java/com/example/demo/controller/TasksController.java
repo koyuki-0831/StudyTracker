@@ -73,8 +73,8 @@ public class TasksController {
 	//タスク更新
 	@PutMapping("/{userId}/{id}")
 	public ResponseEntity<TasksResponseDto> updateTasks(
+			@PathVariable String userId,
 			@PathVariable Long id,
-			@RequestParam String userId,
 			@Valid @RequestBody TasksRequestDto dto
 	) {
 		
@@ -87,7 +87,7 @@ public class TasksController {
 	@DeleteMapping("/{userId}/{id}")
 	public ResponseEntity<Void> deleteTasks(
 			@PathVariable Long id,
-			@RequestParam String userId
+			@PathVariable String userId
 	) {
 		
 		tasksService.deleteTasks(id, userId);

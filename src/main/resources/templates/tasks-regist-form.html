@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>学習タスク登録</title>
+    <style>
+      
+        body {
+            min-height: 100%;
+            margin: 0;
+            font-family: sans-serif;
+    
+            background-color: #fcfcf8;
+    
+            background-image: 
+    
+                /* ドット */
+                radial-gradient(
+                    circle,
+                       #d8d8d8 0.8px,
+                     transparent 1px
+                ),
+    
+                /* 横罫線 */
+                linear-gradient(
+                    to bottom,
+                    transparent 13px,
+                    #e5e5e5 14px
+                );
+    
+                
+            /* ドット間隔 / 行間 */
+            background-size: 
+                14px 14px,
+                100% 14px;
+    
+            background-position: 
+                0 7px,
+                0 0;
+    
+            transition: transform 0.5s ease, opcity 0.5s ease;
+            transform-origin: left center;
+        }
+    
+        body.page-turn {
+            transform: rotateY(-12deg);
+            opacity: 0;
+        }
+    
+        main {
+            padding: 20px 40px 40px;
+            text-align: center;
+        }
+    
+        .page-title {
+            position: relative;
+            display: inline-block;
+    
+            font-size: 48px;
+            color: #001e43;
+    
+            margin-bottom: 50px;
+    
+            margin: 0 0 24px;
+    
+            z-index: 1;
+        }
+    
+        .page-title::after {
+            content: "";
+    
+            position: absolute;
+    
+            left: -8px;
+            bottom: 8px;
+    
+            width: calc(100% + 16px);
+            height: 22px;
+    
+            background-color: rgba(255, 255, 0, 0.45);
+    
+            z-index: -1;
+    
+            transform: rotate(-1deg);
+    
+        }
+
+        .task-form {
+            width: 500px;
+            margin: 0 auto;
+
+            display: flex;
+            flex-direction: column;
+
+            gap: 18px;
+
+            text-align: left;
+        }
+
+        .task-form label {
+            font-size:  18px;
+            font-weight: bold;
+
+            color: #001e43;
+        }
+
+        .task-form input,
+        .task-form textarea,
+        .task-form select {
+            padding: 12px;
+            border: 2px solid #c8c8c8;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: rgba(250, 249, 255, 0.963);
+        }
+
+        .task-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .date-select-area {
+            display: flex;
+            gap: 12px;
+        }
+
+        .date-select-area select {
+            flex: 1;
+        }
+
+        .error-message {
+            color: #d93636;
+            font-size: 18px;
+            font-weight: bold;
+            min-height: 24px;
+            margin: 0;
+        }
+    
+        .button-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+    
+        .menu-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+    
+            width: 220px ;
+            min-height: 50px ;
+            padding: 12px 20px ;
+            margin: 20px;
+    
+            background-color: #a59aca;
+            color: #001e43;
+    
+            font-size: 20px;
+            font-weight: bold;
+    
+            text-decoration: none;
+            text-align: center;
+    
+            border-radius: 4px;
+            box-shadow: 
+                4px 6px 8px rgba(0, 0, 0, 0.18);
+    
+            transform: rotate(-2deg);
+
+            transition: 0.2s;
+    
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .menu-button:hover {
+            transform: rotate(0deg) translateY(-6px);
+            box-shadow: 
+                6px 10px 14px rgba(0, 0, 0, 0.22);
+        }
+    
+        .menu-button::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            bottom: 0;
+    
+            width: 28px;
+            height: 28px;
+    
+            background: linear-gradient(
+                135deg,
+                rgba(0, 0, 0, 0.12),
+                rgba(255, 255, 255, 0.5)
+            );
+        }
+        </style>
+        </head>
+    <body>
+        <div th:replace="~{header :: header}"></div>
+        <h1 class="page-title">学習タスク登録</h1>
+
+        <form id="taskForm" class="task-form">
+
+            <label>タイトル</label>
+            <input type="text" id="title">
+
+            <label>学習詳細</label>
+            <textarea id="description"></textarea>
+
+            <label>優先度</label>
+            <select id="priority" required>
+                <option value="">選択してください</option>
+                <option value="低">低</option>
+                <option value="中">中</option>
+                <option value="高">高</option>
+            </select>
+
+            <label>期限</label>
+            <div class="date-select-area">
+                 <select id="dueYear">
+                    <option value="">年</option>
+                </select>
+
+                <select id="dueMonth">
+                    <option value="">月</option>
+                </select>
+
+                <select id="dueDay">
+                    <option value="">日</option>
+                </select>
+            </div>
+
+            <label>公開設定</label>
+            <select id="visibility">
+                <option value="PUBLIC">公開</option>
+                <option value="PRIVATE">非公開</option>
+            </select>
+
+            <p id="errorMessage" class="error-message"></p>
+
+            <button type="submit" class="menu-button">
+                確認へ
+            </button>
+
+                
+        </form>
+
+         <a th:href="@{/tasks-page}" class="menu-button">
+            戻る
+        </a>
+        
+        <script>
+            // 年月日　select生成
+            const yearSelect =
+                document.getElementById("dueYear");
+
+            const monthSelect = 
+                document.getElementById("dueMonth");
+
+            const daySelect = 
+                document.getElementById("dueDay");
+
+            const thisYear = 
+                new Date().getFullYear();
+
+            //年
+            for(let year = thisYear;
+                year <= thisYear + 5;
+                year++) {
+
+                yearSelect.innerHTML +=
+                    `<option value="${year}">
+                        ${year}
+                    </option>`;    
+            }
+
+            //月
+            for(let month = 1;
+                month <= 12;
+                month++) {
+
+                monthSelect.innerHTML +=
+                    `<option value="${month}">
+                        ${month}
+                    </option>`;
+            }
+
+            //日
+            for (let day = 1;
+                day <= 31;
+                day++) {
+                
+                daySelect.innerHTML +=
+                    `<option value="${day}">
+                        ${day}
+                    </option>`
+                }
+
+            //yyyy-MM-dd
+            function createDueDate() {
+
+                const year = 
+                    yearSelect.value;
+                
+                const month = 
+                    monthSelect.value
+                        .padStart(2, "0");
+                
+                const day =
+                    daySelect.value
+                        .padStart(2, "0");
+                
+                //未入力処理
+                if(
+                    !year ||
+                    !monthSelect.value ||
+                    !daySelect.value
+                ) {
+                    return null;
+                }
+
+                return `${year}-${month}-${day}`;
+            }
+
+            //確認画面遷移
+            document.getElementById("taskForm")
+                .addEventListener("submit", function(event) {
+
+                    event.preventDefault();
+
+                    const errorMessage =
+                        document.getElementById("errorMessage");
+                    
+                    errorMessage.textContent = "";
+
+                    const title =
+                        document.getElementById("title").value;
+
+                    const priority =
+                        document.getElementById("priority").value;
+                    
+                    const dueDate =
+                        createDueDate();
+
+                    
+                    if(!title.trim()) {
+
+                        errorMessage.textContent =
+                            "タイトルは必須です";
+                        
+                        return;
+                    }
+
+                    if(!priority) {
+
+                        errorMessage.textContent =
+                            "優先度を選択してください";
+
+                        return;
+                    }
+
+                    if(priority === "高" && !dueDate) {
+
+                        errorMessage.textContent =
+                            "優先度「高」の場合は期限必須です";
+                        
+                        return;
+                    }
+
+                    const taskData = {
+
+                        title:
+                            title,
+                        
+                        description:
+                            document.getElementById("description").value,
+                        
+                        priority:
+                            priority,
+
+                        due_date:
+                            dueDate,
+
+                        visibility:
+                            document.getElementById("visibility").value
+                    };
+
+                    sessionStorage.setItem(
+                        "taskData",
+                        JSON.stringify(taskData)
+                    );
+
+                    document.body.classList.add("page-turn");
+
+                    setTimeout(() => {
+
+                        window.location.href =
+                            "/tasks-regist-confirm";
+
+                    }, 500);
+                });
+        </script>
+    </body>        
+</html>

@@ -11,6 +11,8 @@ public class TasksRequestDto {
 
 	private  String description;
 	
+	private String status;
+	
 	@NotBlank
 	private String priority;
 
@@ -34,6 +36,14 @@ public class TasksRequestDto {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public String getPriority() {

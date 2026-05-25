@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>学習タスク登録確認</title>
+
+        <style>
+            body {
+                min-height: 100%;
+                margin: 0;
+                font-family: sans-serif;
+                background-color: #fcfcf8;
+                background-image: 
+                    radial-gradient(circle, #d8d8d8 00.8px, transparent 1px),
+                    linear-gradient(to bottom, transparent 13px, #e5e5e5 14px);
+                background-size: 14px 14px, 100% 14px;
+                background-position: 0 7px, 0 0;
+            }
+
+            main {
+                padding: 20px 40px 40px;
+                text-align: center;
+            }
+
+            .page-title {
+                position: relative;
+                display: inline-block;
+                font-size: 48px;
+                color: #001e43;
+                margin: 0 0 32px;
+                z-index: 1;    
+            }
+
+            .page-title::after {
+                content: "";
+                position: absolute;
+                left: -8px;
+                bottom: 8px;
+                width: calc(100% + 16px);
+                height: 22px;
+                background-color: rgba(225, 225, 0, 0.45);
+                z-index: -1;
+                transform: rotate(-1deg);
+            }
+
+            .confirm-card {
+                width: 560px;
+                margin: 0 auto 28px;
+                padding: 28px;
+                background-color: rgba(225, 225, 225, 0.9);
+                border-radius: 10px;
+                box-shadow: 4px 6px 10px rgba(0, 0, 0, 0.15);
+                text-align: left;
+            }
+
+            .confirm-row {
+                display: flex;
+                border-bottom: 1px solid #ddd;
+                padding: 14px 0;
+            }
+
+            .confirm-label {
+                width: 140Px;
+                font-weight: bold;
+                color: #001e43;
+            }
+
+            .confirm-value {
+                flex-grow: 1;
+                color: #333;
+            }
+
+            .button-area {
+                display: flex;
+                justify-content: center;
+                gap: 24px;
+            }
+
+            .menu-button {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 220px;
+                min-height: 50px;
+                padding: 12px 20px;
+                background-color: #a59aca;
+                color: #001e43;
+                font-size: 20px;
+                font-weight: bold;
+                text-decoration: none;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                box-shadow: 4px 6px 8px rgba(0, 0, 0, 0.18);
+            }
+
+            .error-message {
+                color: #d93636;
+                font-weight: bold;
+                min-height: 24px;
+                text-align: center;
+            }
+
+        </style>
+    </head>
+
+    <body>
+    <div th:replace="~{header :: header}"></div>
+
+    <main>
+        <h1 class="page-title">登録内容確認</h1>
+
+        <div class="confirm-card">
+            <div class="confirm-row">
+                <div class="confirm-label">タイトル</div>
+                <div class="confirm-value" id="confirmTitle"></div>
+            </div>
+
+            <div class="confirm-row">
+                <div class="confirm-label">学習詳細</div>
+                <div class="confirm-value" id="confirmDescription"></div>
+            </div>
+
+            <div class="confirm-row">
+                <div class="confirm-label">優先度</div>
+                <div class="confirm-value" id="confirmPriority"></div>
+            </div>
+
+            <div class="confirm-row">
+                <div class="confirm-label">期限</div>
+                <div class="confirm-value" id="confirmDueDate"></div>
+            </div>
+
+            <div class="confirm-row">
+                <div class="confirm-label">公開設定</div>
+                <div class="confirm-value" id="confirmVisibility"></div>
+            </div>
+        </div>
+
+        <p id="errorMessage" class="error-message"></p>
+
+        <div class="button-area">
+            <button type="button" id="registerButton" class="menu-button">
+                登録する
+            </button>
+
+            <a th:href="@{/tasks-regist-form}" class="menu-button">
+                戻る
+            </a>
+        </div>
+    </main>
+
+    <script>
+        const taskData = JSON.parse(sessionStorage.getItem("taskData"));
+
+        if(!taskData) {
+            alert("登録情報がありません。入力画面へ戻ります。");
+            window.location.href = "/tasks-regist-form";
+        }
+
+        document.getElementById("confirmTitle").textContent =
+            taskData.title || "-";
+
+        document.getElementById("confirmDescription").textContent =
+            taskData.description || "-";
+        
+        document.getElementById("confirmPriority").textContent =
+            taskData.priority || "-";
+        
+        document.getElementById("confirmDueDate").textContent =
+            taskData.due_date || "-";
+
+        document.getElementById("confirmVisibility").textContent =
+            taskData.visibility === "PUBLIC" ? "公開" : "非公開";
+        
+        document.getElementById("registerButton")
+            .addEventListener("click", function() {
+
+                fetch("/tasks/create/A2", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(taskData)
+                })
+                .then(response => {
+                    if(!response.ok) {
+                        throw new Error("登録に失敗しました");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    sessionStorage.removeItem("taskData");
+                    alert("登録しました");
+                    window.location.href = "/tasks-page";
+                })
+                .catch(console => {
+                    document.getElementById("errorMessage").textContent =
+                        error.message;
+                });
+            });
+    </script>
+
+    </body>
+</html>
