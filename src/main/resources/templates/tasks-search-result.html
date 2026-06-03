@@ -249,6 +249,13 @@ main {
     box-shadow:
         4px 6px 8px rgba(0, 0, 0, 0.18);
 }
+
+.keyword-marker {
+    background-color: #fff59d;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 2px;
+}
 </style>
 </head>
 
@@ -369,8 +376,8 @@ fetch(`/tasks?${params.toString()}`)
             tr.innerHTML = `
                 <td>${task.id}</td>
                 <td>${task.userId}</td>
-                <td>${task.title}</td>
-                <td>${task.description ?? "-"}</td>
+                <td>${highlightKeyword(task.title)}</td>
+                <td>${highlightKeyword(task.description)}</td>
                 <td>${task.status ?? "-"}</td>
                 <td>${task.priority ?? "-"}</td>
                 <td>${formatDate(task.due_date)}</td>
@@ -452,5 +459,30 @@ function formatDateTime(value) {
     }
     return value.substring(0, 10);
 }
+
+function highlightKeyword(value) {
+
+const keyword = condition.keyword;
+
+if (!value) {
+    return "-";
+}
+
+if (!keyword) {
+    return value;
+}
+
+const escapedKeyword =
+    keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const regex =
+    new RegExp(`(${escapedKeyword})`, "gi");
+
+return String(value).replace(
+    regex,
+    `<mark class="keyword-marker">$1</mark>`
+);
+}
+
 </script>
 </html>
