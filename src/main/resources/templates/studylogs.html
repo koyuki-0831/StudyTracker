@@ -152,16 +152,16 @@
         <h1 class="page-title">学習記録</h1>
 
         <div class="button-area">
-            <a href="studylogs_list.html" class="menu-button">
+            <a th:href="@{/studylogs-list}" class="menu-button">
                 学習記録一覧
             </a>
-            <a href="studylogs_regist.html" class="menu-button">
+            <a th:href="@{/studylogs-search(action='regist')}" class="menu-button">
                 学習記録登録
             </a>
-            <a href="studylogs_update.html" class="menu-button">
+            <a th:href="@{/studylogs-search(action='update')}" class="menu-button">
                 学習記録更新
             </a>
-            <a href="studylogs_delete.html" class="menu-button">
+            <a th:href="@{/studylogs-search(action='delete')}" class="menu-button">
                 学習記録削除
             </a>
 

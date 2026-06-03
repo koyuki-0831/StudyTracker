@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>学習記録検索結果</title>
+
+<style>
+body {
+    min-height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #fcfcf8;
+    background-image: 
+        radial-gradient(circle, #d8d8d8 0.8px, transparent 1px),
+        linear-gradient(to bottom, transparent 13px, #e5e5e5 14px);
+    background-size: 14px 14px, 100% 14px;
+    background-position: 0 7px, 0 0;
+}
+
+main {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin: 0 0 32px;
+    z-index: 1;
+}
+
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(225, 225, 0, 0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
+}
+
+.result-message,
+.error-message {
+    font-weight: bold;
+    min-height: 24px;
+}
+
+.error-message {
+    color: #d93636;
+}
+
+.table-area {
+    width: 100%;
+    overflow: auto;
+    margin-top: 24px;
+}
+
+.task-table {
+    min-width: 1800px;
+    width: max-content;
+    border-collapse: collapse;
+    background-color: rgba(225, 225, 225, 0.92);
+    box-shadow: 4px 6px 10px rgba(0, 0, 0, 0.12);
+}
+
+.task-table th,
+.task-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    color:#001e43;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.task-table th {
+    background-color: #a59aca;
+    font-weight: bold;
+}
+
+.task-table td, long-text {
+    max-width: 220px;
+    white-space: normal;
+    word-break: break-word;
+    text-align: left;
+}
+
+.action-column {
+    position: sticky;
+    right: 0;
+    background-color: #f1f1f1;
+    z-index: 3;
+    box-shadow: -2px 0 6px rgba(0, 0, 0, 0.08);
+}
+
+.task-table th.action-column {
+    background-color: #a59aca;
+}
+
+.task-table td.action-column {
+    background-color: #f1f1f1;
+}
+
+.task-table th.action-column,
+.task-table td.action-column {
+    border-left: 2px solid #d8d8d8;
+}
+
+.action-button,
+.menu-button {
+    border: none;
+    border-radius: 6px;
+    padding: 10px, 14px;
+    background-color: #a59aca;
+    color: #001e43;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.action-button {
+    padding: 8px 14px;
+}
+
+.menu-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    min-height: 50px;
+    margin-top: 32px;
+    font-size: 20px;
+}
+
+.delete-button {
+    background-color: #b8d8ff;
+}
+
+.update-button {
+    background-color: #f4b6b6;
+}
+
+.regist-button {
+    background-color: #c8f7c5;
+}
+
+.keyword-marker {
+    background-color: #fff59d;
+    font-weight: bold;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+</style>
+</head>
+<body>
+<!--<div th:replace="~{header :: header}"></div> -->
+<main>
+    <h1 class="page-title" id="pageTitle">検索結果</h1>
+
+    <p id="resultMessage" class="result-message"></p>
+    <p id="errorMessage" class="error-message"></p>
+
+    <div class="table-area">
+        <table class="task-table">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>    
+
+    <a th:href="@{/studylogs-search}" id="backToSearch" class="menu-button">
+        戻る
+    </a>
+</main>
+<script>
+const userId = "A2";
+
+const condition = 
+    JSON.parse(sessionStorage.getItem("studyLogsTaskSearchCondition"));
+
+if (!condition) {
+    alert("検索条件がありません。検索画面に戻ります。");
+    window.location.href = "/studylogs-search";
+}
+
+const action = condition.action;
+
+console.log("condition", condition);
+console.log("action", action);
+
+const pageTitle = document.getElementById("pageTitle");
+const resultMessage = document.getElementById("resultMessage");
+const errorMessage = document.getElementById("errorMessage");
+const tableHead = document.getElementById("tableHead");
+const tableBody = document.getElementById("tableBody");
+const backToSearch = document.getElementById("backToSearch");
+
+if (action === "regist") {
+    pageTitle.textContent = "記録登録するタスクを選択";
+    resultMessage.textContent = "学習記録を登録するタスクを選択してください。";
+    backToSearch.href = "/studylogs-search?action=regist";
+    loadTasks();
+} else if (action === "update") {
+    pageTitle.textContent = "更新する学習記録を選択";
+    resultMessage.textContent = "更新する学習記録を選択してください。";
+    backToSearch.href = "/studylogs-search?action=update";
+    loadStudyLogs();
+} else if (action === "delete") {
+    pageTitle.textContent = "削除する学習記録を選択";
+    resultMessage.textContent = "削除する学習記録を選択してください。";
+    backToSearch.href = "/studylogs-search?action=delete";
+    loadStudyLogs();
+}
+
+function loadTasks() {
+    const params = new URLSearchParams();
+
+    params.append("userId", userId);
+    params.append("mode", "MY");
+    params.append("page", "0");
+    params.append("size", "20");
+    params.append("sortBy", "id");
+    params.append("direction", "desc");
+
+    appendSearchParams(params);
+
+    fetch(`/tasks?${params.toString()}`)
+        .then(response => {
+            if(!response.ok) {
+                throw new Error("タスク検索に失敗しました");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("tasks response:", data)
+            renderTaskResult(data.content);
+        })
+        .catch(error => {
+            errorMessage.textContent = error.message;
+            console.error(error);
+        });
+}
+
+function loadStudyLogs() {
+    const params = new URLSearchParams();
+
+    params.append("userId", userId);
+    params.append("page", "0");
+    params.append("size", "20");
+    params.append("sortBy", "id");
+    params.append("direction", "desc");
+
+    appendSearchParams(params);
+
+    fetch(`/studylogs?${params.toString()}`)
+        .then(response => {
+            if(!response.ok) {
+                throw new Error("学習記録検索に失敗しました");
+            }
+            return response.json();
+        })
+        .then(data => {
+            renderStudyLogResult(data.content);
+        })
+        .catch(error => {
+            errorMessage.textContent = error.message;
+            console.error(error);
+        });
+}
+
+function appendSearchParams(params) {
+    if(condition.keyword) {
+        params.append("keyword", condition.keyword);
+    }
+
+    if(condition.priority) {
+        params.append("priority", condition.priority);
+    }
+
+    if(condition.status) {
+        params.append("status", condition.status);
+    }
+}
+
+function renderTaskResult(tasks) {
+    tableHead.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>ユーザーID</th>
+            <th>タイトル</th>
+            <th>タスク詳細</th>
+            <th>進行度</th>
+            <th>優先度</th>
+            <th>期限</th>
+            <th>公開/非公開</th>
+            <th>更新日</th>
+            <th>作成日</th>
+            <th class="action-column">操作</th>
+        </tr>
+    `;
+
+    tableBody.innerHTML = "";
+
+    if (!tasks || tasks.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="7">該当するタスクがありません</td>
+            </tr>
+        `;
+        return;
+    }
+
+    tasks.forEach(task => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td class="long-text">${task.id ?? "-"}</td>
+            <td class="long-text">${task.userId ?? task.userId ?? "-"}</td>
+            <td class="long-text">${task.title ?? "-"}</td>
+            <td class="long-text">${task.description || "-"}</td>
+            <td class="long-text">${task.status ?? "-"}</td>
+            <td class="long-text">${task.priority ?? "-"}</td>
+            <td class="long-text">${formatDate(task.due_date ?? task.dueDate)}</td>
+            <td class="long-text">${formatVisibility(task.visibility)}</td>
+            <td class="long-text">${formatDate(task.update_date ?? task.updateDate)}</td>
+            <td class="long-text">${formatDate(task.created_at ?? task.createdAt)}</td>
+            <td class="action-column">
+                <button type="button" class="action-button regist-button">
+                    登録
+                </button>
+            </td>
+        `;
+
+        tr.querySelector(".action-button").addEventListener("click", function() {
+            sessionStorage.setItem(
+                "selectedTasksForStudyLog",
+                JSON.stringify(task)
+            );
+
+            window.location.href = 
+                `/studylogs-regist-form?taskId=${task.id}`;
+        });
+        tableBody.appendChild(tr);
+    });
+}
+
+function renderStudyLogResult(logs) {
+    tableHead.innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>ユーザーID</th>
+            <th>taskID</th>
+            <th>タイトル</th>
+            <th>タスク詳細</th>
+            <th>学習詳細</th>
+            <th>進行度</th>
+            <th>発生した問題</th>
+            <th>原因</th>
+            <th>解決方法</th>
+            <th>メモ</th>
+            <th>優先度</th>
+            <th>期限</th>
+            <th>理解度</th>
+            <th>学習時間（分）</th>
+            <th>学習トータル時間</th>
+            <th>学習完了日</th>
+            <th>公開/非公開</th>
+            <th>更新日</th>
+            <th>制作日</th>
+            <th class="action-column">操作</th>
+        </tr>
+    `;
+
+    tableBody.innerHTML = "";
+
+    if(!logs || logs.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="21">該当する学習記録がありません</td>
+            </tr>
+        `;
+        return;
+    }
+
+    logs.forEach(log => {
+        const tr = document.createElement("tr");
+
+        const buttonLabel = 
+            action === "delete" ? "削除" : "更新";
+        
+        const buttonClass = 
+            action === "delete" ? "delete-button" : "update-button";
+
+        tr.innerHTML = `
+            <td class="long-text">${log.id ?? "-"}</td>
+            <td class="long-text">${log.userId ?? "-"}</td>
+            <td class="long-text">${log.taskId ?? "-"}</td>
+            <td class="long-text">${highlightKeyword(log.taskTitle)}</td>
+            <td class="long-text">${highlightKeyword(log.description)}</td>
+            <td class="long-text">${highlightKeyword(log.studyMethod)}</td>
+            <td class="long-text">${log.status ?? "-"}</td>
+            <td class="long-text">${highlightKeyword(log.issue)}</td>
+            <td class="long-text">${highlightKeyword(log.cause)}</td>
+            <td class="long-text">${highlightKeyword(log.solution)}</td>
+            <td class="long-text">${highlightKeyword(log.memo)}</td>
+            <td class="long-text">${log.priority ?? "-"}</td>
+            <td class="long-text">${formatDate(log.due_date ?? log.dueDate)}</td>
+            <td class="long-text">${log.understandingLabel ?? log.comprehensionLevel ?? "-"}</td>
+            <td class="long-text">${log.durationLabel ?? formatMinutes(log.durationMinutes)}</td>
+            <td class="long-text">${log.totalTimeLabel ?? "-"}</td>
+            <td class="long-text">${formatDate(log.finishDate ?? log.finish_date ?? "-")}</td>
+            <td class="long-text">${formatVisibility(log.visibility)}</td>
+            <td class="long-text">${formatDate(log.update_date ?? log.updateDate)}</td>
+            <td class="long-text">${formatDate(log.created_at ?? log.createdAt)}</td>
+            <td class="action-column">
+                <button type="button" class="action-button ${buttonClass}">
+                    ${buttonLabel}
+                </button>
+            </td>
+        `;
+
+        tr.querySelector(".action-button").addEventListener("click", function() {
+            sessionStorage.setItem(
+                "selectedStudyLog",
+                JSON.stringify(log)
+            );
+
+            sessionStorage.setItem(
+                "studyLogsBackPage",
+                `/studylogs-search-result?action=${action}`
+            );
+
+            if(action === "update") {
+                window.location.href = 
+                    `/studylogs-update-form?id=${log.id}`;
+            } else {
+                window.location.href = 
+                    `/studylogs-delete-confirm?id=${log.id}`;
+            }
+        });
+        tableBody.appendChild(tr);
+    });
+}
+
+function formatDate(value) {
+    if (!value) {
+        return "-";
+    }
+
+    return value.substring(0, 10);
+}
+
+function formatMinutes(value) {
+    if (!value && value !== 0) {
+        return "-";
+    }
+    return `${value}分`;
+}
+
+function formatVisibility(value) {
+    if (value === "PUBLIC") {
+        return "公開"
+    }
+
+    if(value === "PRIVATE") {
+        return "非公開";
+    }
+    return value ?? "-";
+}
+
+function highlightKeyword(value) {
+
+const keyword = condition.keyword;
+
+if(!value) {
+    return "-";
+}
+
+if(!keyword) {
+    return value;
+}
+
+const escapedKeyword =
+    keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const regex =
+    new RegExp(`(${escapedKeyword})`, "gi");
+
+return value.replace(
+    regex,
+    `<mark class="keyword-marker">$1</mark>`
+);
+}
+</script>
+</body>
+</html>

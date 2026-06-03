@@ -169,7 +169,7 @@ main {
             更新する
         </button>
 
-        <a th:href="@{/tasks-update-form}" class="menu-button">
+        <a href="#" id="backButton" class="menu-button">
             戻る
         </a>
     </div>
@@ -215,6 +215,15 @@ document.getElementById("confirmUpdateDate").textContent =
 
 document.getElementById("confirmCreatedAt").textContent =
     formatDateTime(updateTaskData.created_at);
+
+document.getElementById("backButton")
+    .addEventListener("click", function(event) {
+
+        event.preventDefault();
+
+        window.location.href =
+            "/tasks-update-form";
+});
 
 document.getElementById("updateButton")
     .addEventListener("click", function() {

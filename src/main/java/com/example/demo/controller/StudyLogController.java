@@ -48,15 +48,15 @@ public class StudyLogController {
 	//================================
 	// 学習記録更新
 	//================================
-	@PutMapping("/{userId}")
+	@PutMapping("/{userId}/{id}")
 	public ResponseEntity<StudyLogResponseDto> update(
 			@PathVariable String userId,
-			@RequestParam Long taskId,
+			@PathVariable Long id,
 			@Valid @RequestBody StudyLogUpdateDto dto
 	 ) {
 		
 		StudyLogResponseDto response =
-				studyLogService.update(userId, taskId, dto);
+				studyLogService.update(userId, id, dto);
 		
 		return ResponseEntity.ok(response);
 	}
@@ -66,26 +66,49 @@ public class StudyLogController {
 	//====================================
 	@GetMapping
 	public ResponseEntity<Page<StudyLogResponseDto>> getLogs(
-			@RequestParam String userId,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size
+	        @RequestParam String userId,
+	        @RequestParam(required = false) String keyword,
+	        @RequestParam(required = false) String priority,
+	        @RequestParam(required = false) String status,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size
 	) {
-		Page<StudyLogResponseDto> result = 
-				studyLogService.getLogs(userId, page, size);
-		
-		return ResponseEntity.ok(result);
+
+	    Page<StudyLogResponseDto> result;
+
+	    if(keyword != null || priority != null || status != null) {
+
+	        result = studyLogService.searchLogs(
+	                userId,
+	                keyword,
+	                priority,
+	                status,
+	                page,
+	                size
+	        );
+
+	    } else {
+
+	        result = studyLogService.getLogs(
+	                userId,
+	                page,
+	                size
+	        );
+	    }
+
+	    return ResponseEntity.ok(result);
 	}
 	
 	//======================================
 	// 学習記録削除
 	//======================================
-	@DeleteMapping("/{userId}")
+	@DeleteMapping("/{userId}/{id}")
 	public ResponseEntity<Void> delete(
 			@PathVariable String userId,
-			@RequestParam Long taskId
+			@PathVariable Long id
 	) {
 		
-		studyLogService.delate(userId, taskId);
+		studyLogService.delete(userId, id);
 		
 		return ResponseEntity.noContent().build();
 	}

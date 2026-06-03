@@ -33,13 +33,13 @@ public interface StudyLogRepository extends JpaRepository<StudyLogModel, Long> {
 	//=================================
 	
 	//ステータス検索
-	Page<StudyLogModel> findByUserIdAndStatus(String userId, String atatus, Pageable pageable);
-	
+	Page<StudyLogModel> findByUserIdAndStatus(String userId, String status, Pageable pageable);
+
 	//日付範囲検索
 	@Query("""
 		SELECT s FROM StudyLogModel s
 		WHERE s.userId = :userId
-		AND s.studyDate BETWEEN :start AND :end
+		AND s.finishDate BETWEEN :start AND :end
 	""")
 	Page<StudyLogModel> findByDateRange(
 			@Param("userId") String userId,
@@ -50,15 +50,50 @@ public interface StudyLogRepository extends JpaRepository<StudyLogModel, Long> {
 	
 	//キーワード検索（学習内容）
 	@Query("""
-		SELECT s FROM StudyLogModel s
-		WHERE s.userId = :userId
-		AND LOWER(s.studyMethod) LIKE LOWER(CONCAT('%', :keyword, '%')) 
-	""")
-	Page<StudyLogModel> searchByKeyword(
-			@Param("userId") String userId,
-			@Param("keyword") String keyword,
-			Pageable pegeable
-	);
+		    SELECT s FROM StudyLogModel s
+		    JOIN s.tasks t
+		    WHERE s.userId = :userId
+		    AND (
+		        LOWER(s.studyMethod) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.issue) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.cause) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.solution) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.memo) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		    )
+		""")
+		Page<StudyLogModel> searchByKeyword(
+		        @Param("userId") String userId,
+		        @Param("keyword") String keyword,
+		        Pageable pageable
+		);
+	
+	@Query("""
+		    SELECT s FROM StudyLogModel s
+		    JOIN s.tasks t
+		    WHERE s.userId = :userId
+		    AND (:status IS NULL OR :status = '' OR s.status = :status)
+		    AND (:priority IS NULL OR :priority = '' OR t.priority = :priority)
+		    AND (
+		        :keyword IS NULL
+		        OR :keyword = ''
+		        OR LOWER(s.studyMethod) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.issue) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.cause) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.solution) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(s.memo) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(t.title) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		        OR LOWER(t.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+		    )
+		""")
+		Page<StudyLogModel> searchLogs(
+		        @Param("userId") String userId,
+		        @Param("keyword") String keyword,
+		        @Param("priority") String priority,
+		        @Param("status") String status,
+		        Pageable pageable
+		);
 	
 	//==============================
 	//🔹集計（超重要）

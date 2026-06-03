@@ -60,5 +60,55 @@ public class HomeController {
 	public String tasksDeleteConfirm() {
 		return "tasks-delete-confirm";
 	}
+	
+	@GetMapping("/studylogs-search")
+	public String studyLogsSearch() {
+		return "studylogs-search";
+	}
+	
+	@GetMapping("/studylogs-search-result")
+	public String studyLogsSearchResult() {
+		return "studylogs-search-result";
+	}
+	
+	@GetMapping("/studylogs-regist-form")
+	public String studylogsRegistForm() {
+		return "studylogs-regist-form";
+	}
+	
+	@GetMapping("/studylogs-regist-confirm")
+	public String studylogsRegistConfirm() {
+		return "studylogs-regist-confirm";
+	}
+	
+	@GetMapping("/studylogs-update-form")
+	public String studylogsUpdateForm() {
+		return "studylogs-update-form";
+	}
+	
+	@GetMapping("/studylogs-update-confirm")
+	public String studylogsUpdateConfirm() {
+		return "studylogs-update-confirm";
+	}
+	
+	@GetMapping("/studylogs-delete-confirm")
+	public String studylogsDeleteConfirm() {
+		return "studylogs-delete-confirm";
+	}
+	
+	@GetMapping("/studylogs-list")
+	public String studylogsList() {
+		return "studylogs-list";
+	}
+	
+	@GetMapping("/studylogs-detail")
+	public String studylogsDetail() {
+		return "studylogs-detail";
+	}
+	
+	@GetMapping("/tasks-detail")
+	public String tasksDetail() {
+		return "tasks-detail";
+	}
 
 }

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>学習記録削除確認</title>
+
+<style>
+body {
+    min-height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #fcfcf8;
+    background-image:
+        radial-gradient(circle, #d8d8d8 0.8px, transparent 1px),
+        linear-gradient(to bottom, transparent 13px, #e5e5e5 14px);
+    background-size: 14px 14px, 100% 14px;
+    background-position: 0 7px, 0 0;
+}
+
+main {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin: 0 0 32px;
+    z-index: 1;
+}
+
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(255,255,0,0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
+}
+
+.confirm-card {
+    width: 720px;
+    margin: 0 auto;
+    padding: 32px;
+    background-color: rgba(220, 211, 251, 0.95);
+    border-radius: 12px;
+    box-shadow: 4px 6px 10px rgba(0,0,0,0.15);
+    text-align: left;
+}
+
+.confirm-message {
+    margin-bottom: 28px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #c62828;
+    text-align: center;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 18px;
+    padding: 14px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #001e43;
+}
+
+.info-value {
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 36px;
+}
+
+.menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    min-height: 52px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 4px 6px 8px rgba(0,0,0,0.18);
+}
+
+.delete-button {
+    background-color: #7cb3cd;
+    color: white;
+}
+
+.back-button {
+    background-color: #a59aca;
+    color: #001e43;
+}
+</style>
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}"></div>
+
+<main>
+
+    <h1 class="page-title">学習記録削除確認</h1>
+
+    <div class="confirm-card">
+
+        <div class="confirm-message">
+            この学習記録を削除しますか？
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">学習記録ID</div>
+            <div class="info-value" id="logId"></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">タスク名</div>
+            <div class="info-value" id="taskTitle"></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">進行度</div>
+            <div class="info-value" id="status"></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">理解度</div>
+            <div class="info-value" id="understanding"></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">学習時間</div>
+            <div class="info-value" id="duration"></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">学習内容</div>
+            <div class="info-value" id="studyMethod"></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">メモ</div>
+            <div class="info-value" id="memo"></div>
+        </div>
+
+    </div>
+
+    <div class="button-area">
+
+        <button
+            type="button"
+            id="deleteButton"
+            class="menu-button delete-button">
+
+            削除する
+        </button>
+
+        <a
+            href="#"
+            id="backButton"
+            class="menu-button back-button">
+
+            戻る
+        </a>
+
+    </div>
+
+</main>
+
+<script>
+const deleteData =
+    JSON.parse(sessionStorage.getItem("selectedStudyLog"));
+
+if (!deleteData) {
+
+    alert("削除対象データが存在しません。");
+
+    location.href = "/studylogs-list";
+}
+
+document.getElementById("logId").textContent =
+    deleteData.id ?? "-";
+
+document.getElementById("taskTitle").textContent =
+    deleteData.taskTitle ?? "-";
+
+document.getElementById("status").textContent =
+    deleteData.status ?? "-";
+
+document.getElementById("understanding").textContent =
+    deleteData.understandingLabel ?? "-";
+
+document.getElementById("duration").textContent =
+    deleteData.durationLabel ?? "-";
+
+document.getElementById("studyMethod").textContent =
+    deleteData.studyMethod ?? "-";
+
+document.getElementById("memo").textContent =
+    deleteData.memo ?? "-";
+
+const backPage =
+    sessionStorage.getItem("studyLogsBackPage")
+        || "/studylogs-list";
+
+document.getElementById("backButton")
+    .addEventListener("click", function(event) {
+
+        event.preventDefault();
+
+        location.href = backPage;
+    });
+
+document.getElementById("deleteButton")
+    .addEventListener("click", async function() {
+
+        const confirmed =
+            confirm("本当に削除しますか？");
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+
+            const response =
+                await fetch(
+                    `/studylogs/${deleteData.userId}/${deleteData.id}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+            if (!response.ok) {
+                throw new Error("削除に失敗しました");
+            }
+
+            alert("削除しました。");
+
+            location.href = "/studylogs-list";
+
+        } catch(error) {
+
+            console.error(error);
+
+            alert(error.message);
+        }
+    });
+</script>
+
+</body>
+</html>

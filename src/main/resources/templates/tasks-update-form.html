@@ -185,7 +185,7 @@ main {
                 確認へ
             </button>
 
-            <a th:href="@{/tasks-search-result}" class="menu-button">
+            <a href="#" id="backButton" class="menu-button">
                 戻る
             </a>
         </div>
@@ -194,6 +194,9 @@ main {
 <script>
 const selectedTask =
     JSON.parse(sessionStorage.getItem("selectedTask"));
+
+const backPage =
+    sessionStorage.getItem("tasksBackPage") || "/tasks-update-form";
 
 if(!selectedTask) {
     alert("選択されたタスクがありません。検索画面に戻ります。");
@@ -299,13 +302,31 @@ document.getElementById("updateForm")
 
         console.log("updateTaskData before save:", updateTaskData);
 
-        sessionStorage.setItem(
-            "updateTaskData",
+            sessionStorage.setItem(
+                "updateTaskData",
             JSON.stringify(updateTaskData)
         );
 
+        if (!sessionStorage.getItem("tasksBackPage")) {
+
+            sessionStorage.setItem(
+                "tasksBackPage",
+                "/tasks-update-form"
+            );
+        }
+
         window.location.href = "/tasks-update-confirm-page";
     });
+
+document.getElementById("backButton")
+    .addEventListener("click", function(event) {
+
+        event.preventDefault();
+
+        window.location.href =
+            sessionStorage.getItem("tasksBackPage")
+            || "/tasks-list";
+});
 
 function formatDateTime(value) {
     if (!value) {

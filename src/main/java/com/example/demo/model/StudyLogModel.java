@@ -67,8 +67,8 @@ public class StudyLogModel {
 	private Integer durationMinutes;
 	
 	//検索用学習時間
-	@Column(name = "study_date")
-	private LocalDate studyDate;
+	@Column(name = "finish_date")
+	private LocalDate finishDate;
 	
 	// ★ 状態（履歴として持つ）
 	@Column(nullable = false)
@@ -174,12 +174,12 @@ public class StudyLogModel {
 		this.durationMinutes = durationMinutes;
 	}
 
-	public LocalDate getStudyDate() {
-		return studyDate;
+	public LocalDate getFinishDate() {
+		return finishDate;
 	}
 
-	public void setStudyDate(LocalDate studyDate) {
-		this.studyDate = studyDate;
+	public void setFinishDate(LocalDate finishDate) {
+		this.finishDate= finishDate;
 	}
 
 	public String getStatus() {

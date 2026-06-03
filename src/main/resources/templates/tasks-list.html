@@ -1,156 +1,230 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>学習タスク一覧</title>
-    </head>
-    <style>
+<head>
+    <meta charset="UTF-8">
+    <title>学習タスク一覧</title>
+</head>
+<style>
       
-    body {
-		min-height: 100%;
-        margin: 0;
-        font-family: sans-serif;
+body {
+	min-height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #fcfcf8;
+    background-image: 
 
-        background-color: #fcfcf8;
-
-        background-image: 
-
-            /* ドット */
-			radial-gradient(
-				circle,
-			   	#d8d8d8 0.8px,
-			 	transparent 1px
-			),
-
-            /* 横罫線 */
-            linear-gradient(
-                to bottom,
-                transparent 13px,
-                #e5e5e5 14px
-            );
-
-            
+        /* ドット */
+		radial-gradient(circle, #d8d8d8 0.8px, transparent 1px),
+        /* 横罫線 */
+        linear-gradient(to bottom, transparent 13px, #e5e5e5 14px);
+      
         /* ドット間隔 / 行間 */
-        background-size: 
-            14px 14px,
-            100% 14px;
+        background-size: 14px 14px, 100% 14px;
+        background-position: 0 7px, 0 0;
+}
 
-        background-position: 
-            0 7px,
-            0 0;
+main {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
 
-        transition: transform 0.5s ease, opacity 0.5s ease;
-        transform-origin: left center;
-    }
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin: 0 0 32px;
+    z-index: 1;
+}
 
-    body.page-turn {
-        transform: rotateY(-12deg);
-        opacity: 0;
-    }
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(255, 255, 0, 0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
 
-    main {
-        padding: 20px 40px 40px;
-        text-align: center;
-    }
+}
 
-    .page-title {
-        position: relative;
-        display: inline-block;
+.sort-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
 
-        font-size: 48px;
-        color: #001e43;
+.sort-area select,
+.sort-area button {
+    padding: 10px 16px;
+    font-size: 16px;
+    border: 2px solid #c8c8c8;
+    border-radius: 6px;
+}
 
-        margin-bottom: 50px;
+.sort-area button {
+    background-color: #dbd5f0;
+    color: #001e43;
+    font-weight: bold;
+    cursor: pointer;
+}
 
-        margin: 0 0 24px;
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
 
-        z-index: 1;
-    }
+.task-table {
+    min-width: 1300px;
+    width: max-content;
+    border-collapse: collapse;
+    background-color: rgba(229, 223, 246, 0.92);
+    box-shadow: 4px 6px 10px rgba(0, 0, 0, 0.12);
+}
 
-    .page-title::after {
-        content: "";
+.task-table th,
+.task-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #ddd;
+    word-break: break-word;
+    white-space: normal;
+    text-align: center;
+    color: #001e43;
+}
 
-        position: absolute;
+.task-table th {
+    background-color: #b4a4e2;
+    font-weight: bold;
+}
 
-        left: -8px;
-        bottom: 8px;
+.task-table th:nth-child(3),
+.task-table td:nth-child(3) {
+    width: 180px;
+}
 
-        width: calc(100% + 16px);
-        height: 22px;
+.task-table th:nth-child(4),
+.task-table td:nth-child(4) {
+    width: 220px;
+}
 
-        background-color: rgba(255, 255, 0, 0.45);
+.task-table th:last-child,
+.task-table td:last-child {
+    width: 260px;
+}
 
-        z-index: -1;
+.task-table tr:hover {
+    background-color: #cbc2ea;
+}
 
-        transform: rotate(-1deg);
+.status-complete {
+    color: #007a3d;
+    font-weight: bold;
+}
 
-    }
+.status-progress {
+    color: #d97706;
+    font-weight: bold;
+}
 
-    .button-area {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 5px;
-    }
+.status-notstarted {
+    color: #888;
+    font-weight: bold;
+}
+
+.operation-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.operation-button {
+    min-width: 70px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.detail-button {
+    background-color: #f0c236;
+}
+
+.update-button {
+    background-color: #f4b6b6;
+}
+
+.delete-button {
+    background-color: #7cb3cd;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #777;
+    font-size: 20px;
+}
+
+.error-message {
+    color: #d93636;
+    font-weight: bold;
+    min-height: 24px;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
     
 
-    .menu-button {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+.menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px ;
+    min-height: 50px ;
+    padding: 12px 20px ;
+    background-color: #a59aca;
+    color: #001e43;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 4px;
+    box-shadow: 4px 6px 8px rgba(0, 0, 0, 0.18);
+}
+</style>
+<body>
+    <div th:replace="~{header :: header}"></div>
 
-        width: 240px ;
-        min-height: 50px ;
-        padding: 16px 20px ;
-        margin: 20px;
+    <main>
+        <h1 class="page-title">学習タスク一覧</h1>
+            
+        <div class="sort-area">
+            <label>並び替え</label>
 
-        background-color: #a59aca;
-        color: #001e43;
+            <select id="sortBy">
+                <option value="id">ID順</option>
+                <option value="userId">ユーザーID順</option>
+                <option value="title">タイトル五十音順</option>
+                <option value="priority">優先度順</option>
+                <option value="due_date">期限順</option>
+                <option value="created_at">作成日順</option>
+            </select>
 
-        font-size: 22px;
-        font-weight: bold;
+            <button type="button" id="ascButton">昇順</button>
+            <button type="button" id="descButton">降順</button>
+        </div>
 
-        text-decoration: none;
-        text-align: center;
-
-        border-radius: 4px;
-        box-shadow: 
-            4px 6px 8px rgba(0, 0, 0, 0.18);
-
-        transform: rotate(-2deg);
-
-        position: relative;
-        overflow: hidden;
-    }
-
-    .menu-button:hover {
-        transform: rotate(0deg) translateY(-6px);
-        box-shadow: 
-            6px 10px 14px rgba(0, 0, 0, 0.22);
-    }
-
-    .menu-button::after {
-        content: "";
-        position: absolute;
-        right: 0;
-        bottom: 0;
-
-        width: 28px;
-        height: 28px;
-
-        background: linear-gradient(
-            135deg,
-            rgba(0, 0, 0, 0.12),
-            rgba(255, 255, 255, 0.5)
-        );
-    }
-    </style>
-    <body>
-        <div th:replace="~{header :: header}"></div>
-
-        <main>
-            <h1 class="page-title">学習タスク一覧</h1>
-
+        <p id="errorMessage" class="error-message"></p>
+        <div class="table-wrapper">
             <table class="task-table">
                 <thead>
                     <tr>
@@ -160,83 +234,194 @@
                         <th>学習詳細</th>
                         <th>進行度</th>
                         <th>優先度</th>
-                        <th>期限</th>
+                        <th>期限順</th>
                         <th>公開/非公開</th>
                         <th>更新日</th>
                         <th>作成日</th>
+                        <th>操作</th>
                     </tr>
                 </thead>
-                <tbody id="taskTableBody">
 
-                </tbody>
+                <tbody id="taskTableBody"></tbody>
             </table>
+        </div>
 
-            <a th:href="@{/tasks-page}" class="menu-button">
-                戻る
-            </a>
+        <div class="button-area">
+            <a th:href="@{/tasks-page}" class="menu-button">戻る</a>
+        </div>
+    </main>
+</body>
+<script>
+let direction = "desc";
 
+document.addEventListener("DOMContentLoaded", function() {
+    loadTasks();
+});
 
-        </main>
-    </body>
-    <script>
-        document.querySelectorAll(".menu-button").forEach(button => {
-            button.addEventListener("click", function(event) {
-                event.preventDefault();
-    
-                const url = this.getAttribute("href");
-    
-                document.body.classList.add("page-turn");
-    
-                setTimeout(() => {
-                    window.location.href = url;
-                }, 500);
-            });
-        });
+document.getElementById("ascButton")
+    .addEventListener("click", function() {
+        direction = "asc";
+        loadTasks();
+});
 
-        const userId = "A2";
+document.getElementById("descButton")
+    .addEventListener("click", function() {
+        direction = "desc";
+        loadTasks();
+});
 
-        fetch(`/tasks?userId=ALL`)
-            .then(response => {
-                console.log("status", response.status);
-                return response.json();
-            })
-            .then(date => {
-                console.log("取得データ：", date);
-            
-                const today = document.getElementById("taskTableBody");
-                console.log("tbody:", tbody);
+document.getElementById("sortBy")
+    .addEventListener("change", function() {
+        loadTasks();
+});
 
-                if(!tbody) {
-                    alert("taskTableBodyが見つかりませんでした");
-                    return;
-                }
+function loadTasks() {
+    const userId = "A2";
+    const sortBy = document.getElementById("sortBy").value;
+    const params = new URLSearchParams();
 
-                tbody.innerHTML = "";
+    params.append("userId", userId);
+    params.append("mode", "ALL");
+    params.append("page", "0");
+    params.append("size", "20");
+    params.append("sortBy", sortBy);
+    params.append("direction", direction);
 
-                date.content.forEach(task => {
-
-                        const tr = document.createElement("tr");
-                        
-                        tr.innerHTML =`
-                            <td>${task.id}</td>
-                            <td>${task.userId}</td>
-                            <td>${task.title}</td>
-                            <td>${task.description ?? "-"}</td>
-                            <td>${task.status ?? "-"}</td>
-                            <td>${task.priority ?? "-"}</td>
-                            <td>${task.due_date ?? "-"}</td>
-                            <td>${task.visibility ?? "-"}</td>
-                            <td>${task.update_date ?? "-"}</td>
-                            <td>${task.created_at ?? "-"}</td>
-                        `;
-
-                        tbody.appendChild(tr);
-
-                    });
+    fetch(`/tasks?${params.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("タスク一覧の取得に失敗しました");
+            }
+            return response.json();
+        })
+        .then(data => {
+            renderTasks(data.content);
         })
         .catch(error => {
-            console.error("タスク取得エラー", error);
+            document.getElementById("errorMessage").textContent =
+                error.message;
+            console.error(error);
+        });
+}
+
+function renderTasks(tasks) {
+    const tbody = document.getElementById("taskTableBody");
+
+    tbody.innerHTML = "";
+
+    if(!tasks || tasks.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="11">表示できるタスクがありません</td>
+            </tr>
+        `;
+        return;
+    }
+
+    tasks.forEach(task => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${task.id ?? "-"}</td>
+            <td>${task.userId ?? "-"}</td>
+            <td>${task.title ?? "-"}</td>
+            <td>${task.description || "-"}</td>
+            <td>${task.status ?? "-"}</td>
+            <td>${task.priority ?? "-"}</td>
+            <td>${formatData(task.due_date ?? task.dueDate)}</td>
+            <td>${formatVisibility(task.visibility)}</td>
+            <td>${formatData(task.update_date ?? task.updateDate)}</td>
+            <td>${formatData(task.created_at ?? task.createdAt)}</td>
+            <td>
+                 <div class="operation-area">
+                    <button
+                        type="button"
+                        class="operation-button detail-button">
+                        詳細
+                    </button>
+
+                    <button
+                        type="button"
+                        class="operation-button update-button">
+                        更新
+                    </button>
+
+                    <button
+                        type="button"
+                        class="operation-button delete-button">
+                        削除
+                    </button>
+                </div>
+            </td>
+        `;
+
+        tr.querySelector(".detail-button")
+            .addEventListener("click", function() {
+            sessionStorage.setItem(
+                "selectedTask",
+            JSON.stringify(task)
+        );
+
+        sessionStorage.setItem(
+            "tasksBackPage",
+            "/tasks-list"
+        );
+
+        window.location.href =
+            `/tasks-detail?id=${task.id}`;
         });
 
-    </script>
+        tr.querySelector(".update-button")
+            .addEventListener("click", function() {
+            sessionStorage.setItem(
+                "selectedTask",
+            JSON.stringify(task)
+        );
+
+        sessionStorage.setItem(
+            "tasksBackPage",
+            "/tasks-list"
+        );
+
+        window.location.href =
+            `/tasks-update-form?id=${task.id}`;
+        });
+
+        tr.querySelector(".delete-button")
+            .addEventListener("click", function() {
+            sessionStorage.setItem(
+                "selectedTask",
+            JSON.stringify(task)
+        );
+
+        sessionStorage.setItem(
+            "tasksBackPage",
+            "/tasks-list"
+        );
+
+        window.location.href =
+            `/tasks-delete-confirm?id=${task.id}`;
+        });
+
+        tbody.appendChild(tr);
+    });
+}
+
+function formatData(value) {
+    if(!value) {
+        return "-";
+    }
+    return value.substring(0, 10);
+}
+
+function formatVisibility(value) {
+    if(value === "PUBLIC") {
+        return "公開";
+    }
+    if(value === "PRIVATE") {
+        return "非公開";
+    }
+    return value ?? "-";
+}
+</script>
 </html>

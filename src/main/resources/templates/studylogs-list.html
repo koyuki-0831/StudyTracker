@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>学習記録一覧</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #fcfcf8;
+    background-image:
+        radial-gradient(circle, #d8d8d8 0.8px, transparent 1px),
+        linear-gradient(to bottom, transparent 13px, #e5e5e5 14px);
+    background-size: 14px 14px, 100% 14px;
+    background-position: 0 7px, 0 0;
+}
+
+main {
+    padding: 20px 40px 40px;
+}
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin: 0 0 32px;
+    z-index: 1;
+}
+
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(255,255,0,0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
+}
+
+.top-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.sort-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sort-area select,
+.sort-area button {
+    padding: 10px 16px;
+    font-size: 16px;
+    border: 2px solid #c8c8c8;
+    border-radius: 6px;
+}
+
+.sort-area button {
+    background-color: #dbd5f0;
+    color: #001e43;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.menu-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 180px;
+    min-height: 48px;
+    padding: 10px 20px;
+    background-color: #a59aca;
+    color: #001e43;
+    font-size: 18px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 4px 6px 8px rgba(0,0,0,0.18);
+}
+
+.menu-button:hover {
+    opacity: 0.9;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 4px 6px 10px rgba(0,0,0,0.12);
+}
+
+.studylog-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1400px;
+    background-color: rgba(236, 231, 248, 0.92);
+}
+
+.studylog-table thead {
+    background-color: #c7b8f0;
+    color: #001e43;
+}
+
+.studylog-table th,
+.studylog-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.task-table th {
+    background-color: #a7a2f3;
+    font-weight: bold;
+}
+
+.studylog-table tbody tr:nth-child(even) {
+    background-color: #e4dff9;
+}
+
+.studylog-table tbody tr:hover {
+    background-color: #cbc4ee;
+}
+
+.status-complete {
+    color: #007a3d;
+    font-weight: bold;
+}
+
+.status-progress {
+    color: #d97706;
+    font-weight: bold;
+}
+
+.status-notstarted {
+    color: #888;
+    font-weight: bold;
+}
+
+.operation-area {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.operation-button {
+    min-width: 70px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #777;
+    font-size: 20px;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    min-height: 50px;
+    padding: 12px 20px;
+    background-color: #a59aca;
+    color: #001e43;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 4px 6px 8px rgba(0,0,0,0.18);
+}
+
+.detail-button {
+    background-color: #f0c236;
+}
+
+.update-button {
+    background-color: #f4b6b6;
+}
+
+.delete-button {
+    background-color: #7cb3cd;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}"></div>
+
+<main>
+
+    <div class="top-area">
+
+        <h1 class="page-title">学習記録一覧</h1>
+
+    </div>
+
+    <div class="sort-area">
+
+        <label>並び替え</label>
+    
+        <select id="sortBy">
+            <option value="id">ID順</option>
+            <option value="taskTitle">タスク名順</option>
+            <option value="status">進行度順</option>
+            <option value="priority">優先度順</option>
+            <option value="comprehensionLevel">理解度順</option>
+            <option value="durationMinutes">学習時間順</option>
+            <option value="finishDate">完了日順</option>
+            <option value="created_at">作成日順</option>
+        </select>
+    
+        <button type="button" id="ascButton">
+            昇順
+        </button>
+    
+        <button type="button" id="descButton">
+            降順
+        </button>
+    
+    </div>
+
+    <div class="table-wrapper">
+
+        <table class="studylog-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>タスク名</th>
+                    <th>進行度</th>
+                    <th>優先度</th>
+                    <th>理解度</th>
+                    <th>学習時間</th>
+                    <th>合計時間</th>
+                    <th>完了日</th>
+                    <th>公開範囲</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+
+            <tbody id="studylogBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <div
+        id="emptyMessage"
+        class="empty-message"
+        style="display:none;">
+
+        学習記録が存在しません。
+
+    </div>
+
+    <div class="button-area">
+        <a th:href="@{/studylogs-page}" class="menu-button">
+            戻る
+        </a>
+    </div>
+
+</main>
+
+<script>
+const USER_ID = "A2";
+
+let direction = "desc";
+
+loadStudyLogs();
+
+document.getElementById("ascButton")
+    .addEventListener("click", function() {
+        direction = "asc";
+        loadStudyLogs();
+    });
+
+document.getElementById("descButton")
+    .addEventListener("click", function() {
+        direction = "desc";
+        loadStudyLogs();
+    });
+
+document.getElementById("sortBy")
+    .addEventListener("change", function() {
+        loadStudyLogs();
+    });
+
+function loadStudyLogs() {
+
+    const sortBy =
+    document.getElementById("sortBy").value;
+
+        fetch(`/studylogs?userId=${USER_ID}`
+            + `&sortBy=${sortBy}`
+            + `&direction=${direction}`
+        )
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("学習記録一覧の取得に失敗しました");
+            }
+
+            return response.json();
+        })
+        .then(data => {
+
+            console.log(data);
+
+            renderStudyLogs(data.content || []);
+        })
+        .catch(error => {
+
+            console.error(error);
+
+            alert(error.message);
+        });
+}
+
+function renderStudyLogs(logs) {
+
+    const tbody =
+        document.getElementById("studylogBody");
+
+    const emptyMessage =
+        document.getElementById("emptyMessage");
+
+    tbody.innerHTML = "";
+
+    if (logs.length === 0) {
+
+        emptyMessage.style.display = "block";
+
+        return;
+    }
+
+    emptyMessage.style.display = "none";
+
+    logs.forEach(log => {
+
+        const tr =
+            document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${log.id ?? "-"}</td>
+
+            <td>${escapeHtml(log.taskTitle ?? "-")}</td>
+
+            <td class="${getStatusClass(log.status)}">
+                ${log.status ?? "-"}
+            </td>
+
+            <td>${log.priority ?? "-"}</td>
+
+            <td>${log.understandingLabel ?? "-"}</td>
+
+            <td>${log.durationLabel ?? "-"}</td>
+
+            <td>${log.totalTimeLabel ?? "-"}</td>
+
+            <td>${formatDate(log.finishDate)}</td>
+
+            <td>${formatVisibility(log.visibility ?? "-")}</td>
+
+            <td>
+                <div class="operation-area">
+
+                    <button
+                        class="operation-button detail-button"
+                        onclick='moveDetail(${JSON.stringify(log)})'>
+
+                        詳細
+                    </button>
+
+                    <button
+                        class="operation-button update-button"
+                        onclick='moveUpdate(${JSON.stringify(log)})'>
+                        
+                        更新
+                    </button>
+
+                    <button
+                        class="operation-button delete-button"
+                        onclick='moveDelete(${JSON.stringify(log)})'>
+                        
+                        削除
+                    </button>
+
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+function moveDetail(log) {
+
+    sessionStorage.setItem("selectedStudyLog", JSON.stringify(log));
+    sessionStorage.setItem("studyLogsBackPage", "/studylogs-list")
+
+    location.href =
+        "/studylogs-detail";
+}
+
+function moveUpdate(log) {
+    sessionStorage.setItem("selectedStudyLog", JSON.stringify(log));
+    sessionStorage.setItem("studyLogsBackPage", "/studylogs-list");
+
+    location.href = "/studylogs-update-form";
+}
+
+function moveDelete(log) {
+    sessionStorage.setItem("selectedStudyLog", JSON.stringify(log));
+    sessionStorage.setItem("studyLogsBackPage", "/studylogs-list");
+
+    location.href = "/studylogs-delete-confirm";
+}
+
+function getStatusClass(status) {
+
+    switch(status) {
+
+        case "完了":
+            return "status-complete";
+
+        case "進行中":
+            return "status-progress";
+
+        default:
+            return "status-notstarted";
+    }
+}
+
+function formatDate(value) {
+
+    if (!value) {
+        return "-";
+    }
+
+    return String(value).substring(0, 10);
+}
+
+function formatVisibility(value) {
+    if(value === "PUBLIC") {
+        return "公開";
+    }
+
+    if(value === "PRIVATE") {
+        return "非公開";
+    }
+
+    return value ?? "-";
+}
+
+function escapeHtml(str) {
+
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+</script>
+
+</body>
+</html>

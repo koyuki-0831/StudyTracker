@@ -57,7 +57,16 @@ public class StudyLogService {
 		 log.setCreated_at(LocalDateTime.now());
 		 log.setUpdate_date(LocalDateTime.now());
 		 
+		 log.setStatus(dto.getStatus());
+
+		 if("完了".equals(dto.getStatus())) {
+		     log.setFinishDate(LocalDate.now());
+		 } else {
+		     log.setFinishDate(null);
+		 }
+		 
 		 studyLogRepository.save(log);
+		 tasksRepository.save(task);
 		 
 		 return toDto(log); 
 	}
@@ -66,27 +75,47 @@ public class StudyLogService {
 	//🔹更新
 	//===============================
 	@Transactional
-	public StudyLogResponseDto update(String userId, Long taskId, StudyLogUpdateDto dto) {
-		StudyLogModel log = studyLogRepository.findByUserIdAndTasks_Id(userId, taskId)
-				.orElseThrow(() -> new RuntimeException("StudyLog not found"));
-		
-		if(dto.getStudyMethod() != null) log.setStudyMethod(dto.getStudyMethod());
-		if(dto.getIssue() != null) log.setIssue(dto.getIssue());
-		if(dto.getCause() !=null) log.setCause(dto.getCause());
-		if(dto.getSolution() !=null) log.setSolution(dto.getSolution());
-		if(dto.getMemo() !=null) log.setMemo(dto.getMemo());
-		if(dto.getComprehensionLevel() !=null) log.setComprehensionLevel(dto.getComprehensionLevel());
-		if(dto.getDurationMinutes() !=null) log.setDurationMinutes(dto.getDurationMinutes());
-		
-		if(dto.getStatus() !=null) {
-			log.setStatus(dto.getStatus());
-			
-			//★ Task側も更新
-			TasksModel task = log.getTasks();
-			task.setStatus(dto.getStatus());
-		}
-		
-		return toDto(log);
+	public StudyLogResponseDto update(String userId, Long id, StudyLogUpdateDto dto) {
+
+	    System.out.println("userId=" + userId);
+	    System.out.println("id=" + id);
+	    System.out.println("dto.status=" + dto.getStatus());
+	    System.out.println("dto.durationMinutes=" + dto.getDurationMinutes());
+	    System.out.println("dto.comprehensionLevel=" + dto.getComprehensionLevel());
+
+	    StudyLogModel log = studyLogRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("StudyLog not found"));
+
+	    if (!log.getUserId().equals(userId)) {
+	        throw new RuntimeException("更新権限がありません");
+	    }
+
+	    if (dto.getStudyMethod() != null) log.setStudyMethod(dto.getStudyMethod());
+	    if (dto.getIssue() != null) log.setIssue(dto.getIssue());
+	    if (dto.getCause() != null) log.setCause(dto.getCause());
+	    if (dto.getSolution() != null) log.setSolution(dto.getSolution());
+	    if (dto.getMemo() != null) log.setMemo(dto.getMemo());
+	    if (dto.getComprehensionLevel() != null) log.setComprehensionLevel(dto.getComprehensionLevel());
+	    if (dto.getDurationMinutes() != null) log.setDurationMinutes(dto.getDurationMinutes());
+
+	    if (dto.getStatus() != null) {
+	        log.setStatus(dto.getStatus());
+
+	        if ("完了".equals(dto.getStatus())) {
+	            log.setFinishDate(LocalDate.now());
+	        } else {
+	            log.setFinishDate(null);
+	        }
+
+	        TasksModel task = log.getTasks();
+	        task.setStatus(dto.getStatus());
+	        tasksRepository.save(task);
+	    }
+
+	    StudyLogModel saved =
+	            studyLogRepository.save(log);
+
+	    return toDto(saved);
 	}
 	
 	//============================
@@ -119,14 +148,32 @@ public class StudyLogService {
 		);
 	}
 	
+	public Page<StudyLogResponseDto> searchLogs(
+	        String userId,
+	        String keyword,
+	        String priority,
+	        String status,
+	        int page,
+	        int size
+	) {
+		Pageable pageable = PageRequest.of(page, size);
+		
+	    return studyLogRepository.searchLogs(
+	            userId,
+	            keyword,
+	            priority,
+	            status,
+	            pageable
+	    ).map(this::toDto);
+	}
+	
 	//===================================
 	// 🔹学習記録削除
 	//===================================
-	@Transactional(readOnly = true)
-	public void delate(String userId, Long taskId) {
+	@Transactional
+	public void delete(String userId, Long id) {
 		
-		StudyLogModel log = studyLogRepository
-				.findByUserIdAndTasks_Id(userId, taskId)
+		StudyLogModel log = studyLogRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("StudyLog not found"));
 		
 		//所有者チェック
@@ -136,6 +183,8 @@ public class StudyLogService {
 		
 		studyLogRepository.delete(log);
 	}
+	
+	
 	
 	//===================================
 	//  🔹DTO変換（核心）
@@ -155,7 +204,8 @@ public class StudyLogService {
 		dto.setMemo(log.getMemo());
 		dto.setComprehensionLevel(log.getComprehensionLevel());
 		dto.setDurationMinutes(log.getDurationMinutes());
-		dto.setTaskStatus(log.getStatus());
+		dto.setStatus(log.getStatus());
+		dto.setFinishDate(log.getFinishDate());
 		
 		//---------- Task -----------------
 		TasksModel task = log.getTasks();
@@ -196,8 +246,12 @@ public class StudyLogService {
 	}
 	
 	private String formatTotalTime(Integer minutes) {
-		double hours = minutes / 60.0;
-		return String.format("%.1fh", hours);
+	    if (minutes == null) {
+	        return "0.0h";
+	    }
+
+	    double hours = minutes / 60.0;
+	    return String.format("%.1fh", hours);
 	}
 	
 	private String formatUnderstanding(Integer level) {

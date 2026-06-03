@@ -16,6 +16,7 @@ public class StudyLogResponseDto {
 	private String memo;
 	private Integer comprehensionLevel;
 	private Integer durationMinutes;
+	private LocalDate finishDate;
 	private String status;
 	
 	// ----- Task -----
@@ -64,6 +65,9 @@ public class StudyLogResponseDto {
 	
 	public Integer getDurationMinutes() { return durationMinutes; }
 	public void setDurationMinutes(Integer durationMinutes) { this.durationMinutes = durationMinutes; }
+	
+	public LocalDate getFinishDate() { return finishDate; }
+	public void setFinishDate(LocalDate finishDate) { this.finishDate = finishDate; }
 	
 	public String getStatus() { return status; }
 	public void setStatus(String status) { this.status = status; }

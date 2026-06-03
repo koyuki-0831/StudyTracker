@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>タスク詳細</title>
+
+<style>
+body {
+    min-height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+
+    background-color: #fcfcf8;
+
+    background-image:
+        radial-gradient(
+            circle,
+            #d8d8d8 0.8px,
+            transparent 1px
+        ),
+        linear-gradient(
+            to bottom,
+            transparent 13px,
+            #e5e5e5 14px
+        );
+
+    background-size:
+        14px 14px,
+        100% 14px;
+
+    background-position:
+        0 7px,
+        0 0;
+}
+
+main {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin-bottom: 32px;
+    z-index: 1;
+}
+
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(255, 255, 0, 0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
+}
+
+.detail-card {
+    width: 80%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px;
+    background-color: rgba(220, 211, 251, 0.92);
+    border-radius: 18px;
+    box-shadow: 4px 6px 10px rgba(0,0,0,0.12);
+    text-align: left;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #001e43;
+    margin: 0 0 24px;
+    padding-bottom: 18px;
+    border-bottom: 3px solid #a59aca;
+}
+
+.section-title:not(:first-child) {
+    margin-top: 44px;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 40px;
+    padding: 18px 0;
+    border-bottom: 1px solid #e5e5e5;
+    align-items: center;
+}
+
+.detail-label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #001e43;
+}
+
+.detail-value {
+    font-size: 20px;
+    color: #333;
+    word-break: break-word;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+.menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 220px;
+    min-height: 50px;
+
+    padding: 12px 20px;
+
+    background-color: #a59aca;
+
+    color: #001e43;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    text-decoration: none;
+
+    border: none;
+    border-radius: 4px;
+
+    cursor: pointer;
+
+    box-shadow:
+        4px 6px 8px rgba(0, 0, 0, 0.18);
+}
+</style>
+</head>
+
+<body>
+
+<div th:replace="~{header :: header}"></div>
+
+<main>
+
+    <h1 class="page-title">
+        タスク詳細
+    </h1>
+
+    <div class="detail-card">
+
+        <h2 class="section-title">基本情報</h2>
+
+        <div class="detail-row">
+            <div class="detail-label">ID</div>
+            <div class="detail-value" id="detailId"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">ユーザーID</div>
+            <div class="detail-value" id="detailUserId"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">タイトル</div>
+            <div class="detail-value" id="detailTitle"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">学習詳細</div>
+            <div class="detail-value" id="detailDescription"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">優先度</div>
+            <div class="detail-value" id="detailPriority"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">期限</div>
+            <div class="detail-value" id="detailDueDate"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">公開/非公開</div>
+            <div class="detail-value" id="detailVisibility"></div>
+        </div>
+
+        <h2 class="section-title">管理情報</h2>
+
+        <div class="detail-row">
+            <div class="detail-label">進行度</div>
+            <div class="detail-value" id="detailStatus"></div>
+        </div>
+
+
+        <div class="detail-row">
+            <div class="detail-label">更新日</div>
+            <div class="detail-value" id="detailUpdateDate"></div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">作成日</div>
+            <div class="detail-value" id="detailCreatedAt"></div>
+        </div>
+
+    </div>
+
+    <div class="button-area">
+        <a href="#" id="backButton" class="menu-button">
+            戻る
+        </a>
+    </div>
+
+</main>
+
+<script>
+const selectedTask =
+    JSON.parse(sessionStorage.getItem("selectedTask"));
+
+if(!selectedTask) {
+
+    alert("表示対象のタスクがありません");
+
+    window.location.href = "/tasks-list";
+}
+
+document.getElementById("detailId").textContent =
+    selectedTask.id ?? "-";
+
+document.getElementById("detailUserId").textContent =
+    selectedTask.userId ?? "-";
+
+document.getElementById("detailTitle").textContent =
+    selectedTask.title ?? "-";
+
+document.getElementById("detailDescription").textContent =
+    selectedTask.description ?? "-";
+
+document.getElementById("detailStatus").textContent =
+    selectedTask.status ?? "-";
+
+document.getElementById("detailPriority").textContent =
+    selectedTask.priority ?? "-";
+
+document.getElementById("detailDueDate").textContent =
+    formatDate(selectedTask.due_date);
+
+document.getElementById("detailVisibility").textContent =
+    formatVisibility(selectedTask.visibility);
+
+document.getElementById("detailUpdateDate").textContent =
+    formatDate(selectedTask.update_date);
+
+document.getElementById("detailCreatedAt").textContent =
+    formatDate(selectedTask.created_at);
+
+document.getElementById("backButton")
+    .addEventListener("click", function(event) {
+
+        event.preventDefault();
+
+        window.location.href =
+            "/tasks-list";
+});
+
+function formatDate(value) {
+
+    if(!value) {
+        return "-";
+    }
+
+    return value.substring(0, 10);
+}
+
+function formatVisibility(value) {
+
+    if(value === "PUBLIC") {
+        return "公開";
+    }
+
+    if(value === "PRIVATE") {
+        return "非公開";
+    }
+
+    return value ?? "-";
+}
+</script>
+
+</body>
+</html>

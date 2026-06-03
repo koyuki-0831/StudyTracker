@@ -130,7 +130,7 @@ main {
 
         <div class="confirm-row">
             <div class="confirm-label">ユーザーID:</div>
-            <div class="confirm-value" id="confirmTitle"></div>
+            <div class="confirm-value" id="confirmUserId"></div>
         </div>
 
         <div class="confirm-row">
@@ -149,6 +149,11 @@ main {
         </div>
 
         <div class="confirm-row">
+            <div class="confirm-label">優先度:</div>
+            <div class="confirm-value" id="confirmPriority"></div>
+        </div>
+
+        <div class="confirm-row">
             <div class="confirm-label">期限:</div>
             <div class="confirm-value" id="confirmDueDate"></div>
         </div>
@@ -164,7 +169,8 @@ main {
         </div>
 
         <div class="confirm-row">
-            <div class="confirm-label" id="confirmCreatedAt"></div>
+            <div class="confirm-label">作成日:</div>
+            <div class="confirm-value" id="confirmCreatedAt"></div>
         </div>
     </div>
 
@@ -175,7 +181,7 @@ main {
             削除する
         </button>
 
-        <a th:href="@{/tasks-search-result}" class="menu-button">
+        <a href="#" id="backButton" class="menu-button">
             戻る
         </a>
     </div>
@@ -184,6 +190,9 @@ main {
 <script>
 const selectedTask =
     JSON.parse(sessionStorage.getItem("selectedTask"));
+
+const backPage = 
+    sessionStorage.getItem("tasksBackPage") || "/tasks-update-form";
 
 if(!selectedTask) {
     alert("削除対象のタスクがありません。検索画面に戻ります。");
@@ -194,7 +203,7 @@ document.getElementById("confirmId").textContent =
     selectedTask.id ?? "-";
 
 document.getElementById("confirmUserId").textContent =
-    selectedTask.userId ?? "-";
+    selectedTask.userId ?? selectedTask.user_id ?? "-";
 
 document.getElementById("confirmTitle").textContent =
     selectedTask.title ?? "-";
@@ -209,16 +218,16 @@ document.getElementById("confirmPriority").textContent =
     selectedTask.priority ?? "-";
 
 document.getElementById("confirmDueDate").textContent =
-    formatData(selectedTask.due_date);
+    formatData(selectedTask.due_date ?? selectedTask.dueDate);
 
 document.getElementById("confirmVisibility").textContent =
-    formatVisibility(selectedTask.Visibility);
+    formatVisibility(selectedTask.visibility);
 
 document.getElementById("confirmUpdateDate").textContent =
-    formatData(selectedTask.upfate_date);
+    formatData(selectedTask.update_date ?? selectedTask.updateDate);
 
 document.getElementById("confirmCreatedAt").textContent =
-    formatData(selectedTask.created_at);
+    formatData(selectedTask.created_at ?? selectedTask.createdAt);
 
 document.getElementById("deleteButton")
     .addEventListener("click", function() {
@@ -244,6 +253,16 @@ document.getElementById("deleteButton")
             console.error(error);
         });   
     });
+
+document.getElementById("backButton")
+    .addEventListener("click", function(event) {
+
+        event.preventDefault();
+
+        window.location.href =
+            sessionStorage.getItem("tasksBackPage")
+            || "/tasks-list";
+});
 
 function formatData(value) {
     if(!value) {

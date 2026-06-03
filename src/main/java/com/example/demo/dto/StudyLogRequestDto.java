@@ -1,5 +1,7 @@
 package com.example.demo.dto;
 
+import java.time.LocalDate;
+
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +26,8 @@ public class StudyLogRequestDto {
 	@Min(1)
 	@Max(1440)
 	private Integer durationMinutes;
+	
+	private LocalDate finishDate;
 	
 	@NotNull
 	private String status;
@@ -51,6 +55,12 @@ public class StudyLogRequestDto {
 	public Integer getDurationMinutes() { return durationMinutes; }
 	public void setDurationMinutes(Integer durationMinutes) { this.durationMinutes = durationMinutes; }
 
+	public LocalDate getFinishDate() {
+		return finishDate;
+	}
+	public void setFinishDate(LocalDate finishDate) {
+		this.finishDate = finishDate;
+	}
 	public String getStatus() { return status; }
 	public void setStatus(String status) { this.status = status; }
 

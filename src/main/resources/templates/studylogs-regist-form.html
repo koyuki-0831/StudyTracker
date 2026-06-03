@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>学習記録登録</title>
+
+<style>
+body {
+    min-height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+    background-color: #fcfcf8;
+    background-image:
+        radial-gradient(circle, #d8d8d8 0.8px, transparent 1px),
+        linear-gradient(to bottom, transparent 13px, #e5e5e5 14px);
+    background-size: 14px 14px, 100% 14px;
+    background-position: 0 7px, 0 0;
+}
+
+main {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
+
+.page-title {
+    position: relative;
+    display: inline-block;
+    font-size: 48px;
+    color: #001e43;
+    margin: 0 0 32px;
+    z-index: 1;
+}
+
+.page-title::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: 8px;
+    width: calc(100% + 16px);
+    height: 22px;
+    background-color: rgba(255,255,0,0.45);
+    z-index: -1;
+    transform: rotate(-1deg);
+}
+
+.form-card {
+    width: 720px;
+    margin: 0 auto;
+    padding: 32px;
+    background-color: rgba(220, 211, 251, 0.95);
+    border-radius: 12px;
+    box-shadow: 4px 6px 10px rgba(0,0,0,0.15);
+    text-align: left;
+}
+
+.section-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #001e43;
+    margin: 0 0 18px;
+    border-bottom: 2px solid #a59aca;
+    padding-bottom: 8px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #001e43;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #c8c8c8;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.readonly-field {
+    background-color: #eeeeee;
+    color: #555;
+}
+
+.error-message {
+    color: #d93636;
+    font-weight: bold;
+    text-align: center;
+    min-height: 24px;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.menu-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 220px;
+    min-height: 50px;
+    padding: 12px 20px;
+    background-color: #a59aca;
+    color: #001e43;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 4px 6px 8px rgba(0,0,0,0.18);
+}
+</style>
+</head>
+
+<body>
+<div th:replace="~{header :: header}"></div>
+
+<main>
+    <h1 class="page-title">学習記録登録</h1>
+
+    <form id="studyLogRegistForm" class="form-card">
+
+        <p class="section-title">タスク情報</p>
+
+        <div class="form-group">
+            <label>タスクID</label>
+            <input type="text" id="taskId" class="readonly-field" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>ユーザーID</label>
+            <input type="text" id="userId" class="readonly-field" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>タイトル</label>
+            <input type="text" id="taskTitle" class="readonly-field" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>タスク詳細</label>
+            <textarea id="description" class="readonly-field" readonly></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>優先度</label>
+            <input type="text" id="priority" class="readonly-field" readonly>
+        </div>
+
+        <div class="form-group">
+            <label>期限</label>
+            <input type="text" id="dueDate" class="readonly-field" readonly>
+        </div>
+
+        <p class="section-title">学習記録入力</p>
+
+        <div class="form-group">
+            <label>学習詳細</label>
+            <textarea id="studyMethod" placeholder="具体的にどう学習したか"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>進行度</label>
+            <select id="status">
+                <option value="">選択してください</option>
+                <option value="未着手">未着手</option>
+                <option value="進行中">進行中</option>
+                <option value="完了">完了</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>発生した問題</label>
+            <textarea id="issue" placeholder="例：DBエラー、画面表示崩れなど"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>原因</label>
+            <textarea id="cause" placeholder="例：スペルミス、設定漏れなど"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>解決方法</label>
+            <textarea id="solution" placeholder="どう解決したか"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>メモ</label>
+            <textarea id="memo" placeholder="補足メモ"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>理解度</label>
+            <select id="comprehensionLevel">
+                <option value="">選択してください</option>
+                <option value="1">★☆☆☆☆</option>
+                <option value="2">★★☆☆☆</option>
+                <option value="3">★★★☆☆</option>
+                <option value="4">★★★★☆</option>
+                <option value="5">★★★★★</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>学習時間（分）</label>
+            <input type="number" id="durationMinutes" min="1" placeholder="例：30">
+        </div>
+
+        <p id="errorMessage" class="error-message"></p>
+
+        <div class="button-area">
+            <button type="submit" class="menu-button">
+                確認
+            </button>
+
+            <a th:href="@{/studylogs-search-result}" class="menu-button">
+                戻る
+            </a>
+        </div>
+    </form>
+</main>
+
+<script>
+const selectedTask =
+    JSON.parse(sessionStorage.getItem("selectedTasksForStudyLog"));
+
+if (!selectedTask) {
+    alert("選択されたタスクがありません。検索画面へ戻ります。");
+    window.location.href = "/studylogs-search?action=regist";
+}
+
+document.getElementById("taskId").value =
+    selectedTask.id ?? "";
+
+document.getElementById("userId").value =
+    selectedTask.userId ?? "";
+
+document.getElementById("taskTitle").value =
+    selectedTask.title ?? "";
+
+document.getElementById("description").value =
+    selectedTask.description ?? "";
+
+document.getElementById("priority").value =
+    selectedTask.priority ?? "";
+
+document.getElementById("dueDate").value =
+    formatDate(selectedTask.due_date ?? selectedTask.dueDate);
+
+document.getElementById("status").value =
+    selectedTask.status ?? "";
+
+    document.getElementById("studyLogRegistForm")
+    .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        const errorMessage =
+            document.getElementById("errorMessage");
+
+        errorMessage.textContent = "";
+
+        const studyMethod =
+            document.getElementById("studyMethod").value.trim();
+
+        const status =
+            document.getElementById("status").value;
+
+        const comprehensionLevel =
+            document.getElementById("comprehensionLevel").value;
+
+        const durationMinutes =
+            document.getElementById("durationMinutes").value;
+
+        if (!studyMethod) {
+            errorMessage.textContent = "学習詳細は必須です";
+            return;
+        }
+
+        if (!status) {
+            errorMessage.textContent = "進行度は必須です";
+            return;
+        }
+
+        if (!comprehensionLevel) {
+            errorMessage.textContent = "理解度は必須です";
+            return;
+        }
+
+        if (!durationMinutes) {
+            errorMessage.textContent = "学習時間は必須です";
+            return;
+        }
+
+        const registData = {
+
+            // task情報
+            taskId: selectedTask.id,
+            userId: selectedTask.userId,
+            title: selectedTask.title,
+            description: selectedTask.description,
+            priority: selectedTask.priority,
+            dueDate: selectedTask.due_date,
+
+            // studylogs入力
+            studyMethod: studyMethod,
+            status: status,
+            issue: document.getElementById("issue").value,
+            cause: document.getElementById("cause").value,
+            solution: document.getElementById("solution").value,
+            memo: document.getElementById("memo").value,
+            comprehensionLevel: Number(comprehensionLevel),
+            durationMinutes: Number(durationMinutes)
+        };
+
+        sessionStorage.setItem(
+            "studyLogRegistData",
+            JSON.stringify(registData)
+        );
+
+        window.location.href =
+            "/studylogs-regist-confirm";
+    });
+
+function formatDate(value) {
+    if (!value) {
+        return "-";
+    }
+
+    return value.substring(0, 10);
+}
+</script>
+
+</body>
+</html>
