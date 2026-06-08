@@ -150,8 +150,12 @@
         </div>
     </main>
 
-    <script>
-        const taskData = JSON.parse(sessionStorage.getItem("taskData"));
+<script src="/js/auth-check.js"></script>
+<script>
+    const userId =
+        getLoginUserIdOrRedirect();
+
+    const taskData = JSON.parse(sessionStorage.getItem("taskData"));
 
         if(!taskData) {
             alert("登録情報がありません。入力画面へ戻ります。");
@@ -176,7 +180,7 @@
         document.getElementById("registerButton")
             .addEventListener("click", function() {
 
-                fetch("/tasks/create/A2", {
+                fetch(`/tasks/create/${encodeURIComponent(userId)}`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -194,7 +198,16 @@
                     alert("登録しました");
                     window.location.href = "/tasks-page";
                 })
-                .catch(console => {
+                .then(async response => {
+                    if(!response.ok) {
+                        const errorText =
+                        await response.text();
+                    console.error(errorText);
+                    throw new Error(errorText);
+                }
+                return response.json();
+                })
+                .catch(error => {
                     document.getElementById("errorMessage").textContent =
                         error.message;
                 });
