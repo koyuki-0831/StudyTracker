@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>ログイン</title>
+
+<style>
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+
+    background-color: #fcfcf8;
+
+    background-image:
+        radial-gradient(circle,#d8d8d8 0.8px,transparent 1px),
+        linear-gradient(to bottom,transparent 13px,#e5e5e5 14px);
+
+    background-size:
+        14px 14px,
+        100% 14px;
+
+    background-position:
+        0 7px,
+        0 0;
+}
+
+main {
+    text-align: center;
+    padding-top: 60px;
+}
+
+.page-title {
+    font-size: 48px;
+    color: #001e43;
+}
+
+.login-form {
+    width: 500px;
+
+    margin: 40px auto;
+
+    padding: 32px;
+
+    background-color: rgba(220,211,251,0.95);
+
+    border-radius: 12px;
+
+    box-shadow:
+        4px 6px 10px rgba(0,0,0,0.15);
+}
+
+.form-group {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+
+    border: 2px solid #ccc;
+    border-radius: 6px;
+
+    box-sizing: border-box;
+}
+
+.menu-button {
+    width: 220px;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #a59aca;
+
+    color: #001e43;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.error-message {
+    color: red;
+    min-height: 24px;
+}
+</style>
+</head>
+
+<body>
+    <div th:replace="~{header :: header}"></div>
+
+<main>
+
+    <h1 class="page-title">
+        ログイン
+    </h1>
+
+    <form id="loginForm" class="login-form">
+
+        <div class="form-group">
+            <label>メールアドレス</label>
+            <input type="email" id="email">
+        </div>
+
+        <div class="form-group">
+            <label>パスワード</label>
+            <input type="password" id="password">
+        </div>
+
+        <p id="errorMessage" class="error-message"></p>
+
+        <button type="submit" class="menu-button">
+            ログイン
+        </button>
+
+    </form>
+
+</main>
+
+<script>
+
+document.getElementById("loginForm")
+    .addEventListener("submit", async function(event){
+
+    event.preventDefault();
+
+    const response = await fetch(
+        "/auth/login",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email:
+                    document.getElementById("email").value,
+
+                password:
+                    document.getElementById("password").value
+            })
+        }
+    );
+
+    if(!response.ok){
+        document.getElementById("errorMessage")
+            .textContent =
+                "ログインに失敗しました";
+        return;
+    }
+
+    const user = await response.json();
+
+    sessionStorage.setItem(
+        "loginUser",
+        JSON.stringify(user)
+    );
+
+    sessionStorage.setItem(
+        "loginUserId",
+        user.userId
+    );
+
+    sessionStorage.setItem(
+        "loginTime",
+        Date.now().toString()
+    );
+
+    location.href = "/";
+});
+</script>
+
+</body>
+</html>

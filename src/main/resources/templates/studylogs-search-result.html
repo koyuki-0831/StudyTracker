@@ -176,15 +176,23 @@ main {
         戻る
     </a>
 </main>
+<script src="/js/auth-check.js"></script>
 <script>
-const userId = "A2";
 
-const condition = 
-    JSON.parse(sessionStorage.getItem("studyLogsTaskSearchCondition"));
+const userId =
+    getLoginUserIdOrRedirect();
 
-if (!condition) {
-    alert("検索条件がありません。検索画面に戻ります。");
+const condition =
+    JSON.parse(
+        sessionStorage.getItem(
+            "studyLogsTaskSearchCondition"
+        )
+    );
+
+if(!condition) {
+    alert("検索条件がありません");
     window.location.href = "/studylogs-search";
+    throw new Error("No Search Condition");
 }
 
 const action = condition.action;
@@ -495,6 +503,7 @@ return value.replace(
     `<mark class="keyword-marker">$1</mark>`
 );
 }
+
 </script>
 </body>
 </html>

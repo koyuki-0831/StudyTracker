@@ -110,5 +110,20 @@ public class HomeController {
 	public String tasksDetail() {
 		return "tasks-detail";
 	}
+	
+	@GetMapping("/login")
+	public String login() {
+		return "login";
+	}
+	
+	@GetMapping("/register")
+	public String register() {
+		return "register";
+	}
+	
+	@GetMapping("/register-confirm")
+	public String registConfirm() {
+		return "register-confirm";
+	}
 
 }

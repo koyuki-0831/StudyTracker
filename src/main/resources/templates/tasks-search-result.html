@@ -298,8 +298,10 @@ main {
     </div>
 </main>
 </body>
+<script src="/js/auth-check.js"></script>
 <script>
-const userId = "A2";
+const userId =
+    getLoginUserIdOrRedirect();
 
 const condition = 
     JSON.parse(sessionStorage.getItem("taskSearchCondition"));

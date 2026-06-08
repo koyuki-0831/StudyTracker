@@ -292,8 +292,11 @@ main {
 
 </main>
 
+<script src="/js/auth-check.js"></script>
 <script>
-const USER_ID = "A2";
+
+const userId =
+    getLoginUserIdOrRedirect();
 
 let direction = "desc";
 
@@ -321,7 +324,7 @@ function loadStudyLogs() {
     const sortBy =
     document.getElementById("sortBy").value;
 
-        fetch(`/studylogs?userId=${USER_ID}`
+        fetch(`/studylogs?userId=${userId}`
             + `&sortBy=${sortBy}`
             + `&direction=${direction}`
         )

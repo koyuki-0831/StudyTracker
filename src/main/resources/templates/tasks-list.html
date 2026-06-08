@@ -252,6 +252,18 @@ main {
     </main>
 </body>
 <script>
+window.addEventListener("DOMContentLoaded", async () => {
+
+    const userId =
+        getLoginUserIdOrRedirect();
+
+// ↓ここから先で userId を使う
+const response = await fetch(
+    `/tasks?userId=${userId}`
+);
+
+});
+
 let direction = "desc";
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -276,7 +288,17 @@ document.getElementById("sortBy")
 });
 
 function loadTasks() {
-    const userId = "A2";
+    const userId =
+        sessionStorage.getItem("loginUserId");
+
+    if(!userId) {
+
+        alert("ログインしてください");
+
+        window.location.href = "/login";
+
+        return;
+    }
     const sortBy = document.getElementById("sortBy").value;
     const params = new URLSearchParams();
 

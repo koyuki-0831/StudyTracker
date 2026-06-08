@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name = "tasks_model")
+@Table(name = "tasks")
 public class TasksModel {
 	
 	@Column(nullable = false)

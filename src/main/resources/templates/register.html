@@ -1,0 +1,206 @@
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>アカウント登録</title>
+
+<style>
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+
+    background-color: #fcfcf8;
+
+    background-image:
+        radial-gradient(circle,#d8d8d8 0.8px,transparent 1px),
+        linear-gradient(to bottom,transparent 13px,#e5e5e5 14px);
+
+    background-size:
+        14px 14px,
+        100% 14px;
+
+    background-position:
+        0 7px,
+        0 0;
+}
+
+main {
+    text-align: center;
+    padding-top: 60px;
+}
+
+.page-title {
+    font-size: 48px;
+    color: #001e43;
+}
+
+.login-form {
+    width: 500px;
+
+    margin: 40px auto;
+
+    padding: 32px;
+
+    background-color: rgba(220,211,251,0.95);
+
+    border-radius: 12px;
+
+    box-shadow:
+        4px 6px 10px rgba(0,0,0,0.15);
+}
+
+.form-group {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+
+    border: 2px solid #ccc;
+    border-radius: 6px;
+
+    box-sizing: border-box;
+}
+
+.button-area {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.menu-button {
+    width: 220px;
+
+    padding: 12px;
+
+    border: none;
+    border-radius: 6px;
+
+    background-color: #a59aca;
+
+    color: #001e43;
+
+    font-size: 20px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    text-decoration: none; 
+}
+
+.error-message {
+    color: red;
+    min-height: 24px;
+}
+</style>
+</head>
+
+<body>
+    <div th:replace="~{header :: header}"></div>
+<main>
+    <form id="registerForm" class="login-form">
+
+        <div class="form-group">
+            <label>ユーザーID</label>
+            <input type="text" id="userId">
+        </div>
+    
+        <div class="form-group">
+            <label>ユーザー名</label>
+            <input type="text" id="username">
+        </div>
+    
+        <div class="form-group">
+            <label>メールアドレス</label>
+            <input type="email" id="email">
+        </div>
+    
+        <div class="form-group">
+            <label>パスワード</label>
+            <input type="password" id="password">
+        </div>
+        <div class="form-group">
+            <label>パスワード確認</label>
+            <input type="password" id="passwordConfirm">
+        </div>
+            <p id="errorMessage" class="error-message"></p>
+    
+        <div class="button-area">
+            <button type="submit" class="menu-button">
+                登録
+            </button>
+
+            <a th:href="@{/}" class="menu-button">
+                戻る
+            </a>
+        </div>
+    
+    </form>
+</main>
+<script>
+document.getElementById("registerForm")
+    .addEventListener("submit", function(event) {
+
+        event.preventDefault();
+
+        const userId =
+            document.getElementById("userId").value.trim();
+
+        const username =
+            document.getElementById("username").value.trim();
+
+        const email =
+            document.getElementById("email").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+        const passwordConfirm =
+            document.getElementById("passwordConfirm").value;
+
+        const errorMessage =
+            document.getElementById("errorMessage");
+
+        errorMessage.textContent = "";
+
+        if (!userId || !username || !email || !password || !passwordConfirm) {
+            errorMessage.textContent = "未入力の項目があります";
+            return;
+        }
+
+        if(password.length < 6) {
+            errorMessage.textContent =
+                "パスワードは6文字以上で入力してください";
+            return;
+        }
+
+        if (password !== passwordConfirm) {
+            errorMessage.textContent = "パスワードが一致しません";
+            return;
+        }
+
+        const registerData = {
+            userId: userId,
+            username: username,
+            email: email,
+            password: password
+        };
+
+        sessionStorage.setItem(
+            "registerData",
+            JSON.stringify(registerData)
+        );
+
+        window.location.href = "/register-confirm";
+    });
+</script>
+</body>

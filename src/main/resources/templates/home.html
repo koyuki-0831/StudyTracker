@@ -117,11 +117,18 @@
         </a><br>
         <a th:href="@{/studylogs-page}" class="menu-button">
             📖学習記録📖
+        </a><br>
+        <a th:href="@{/register}" class="menu-button">
+            👤アカウント登録👤
         </a>
         
     </main>
 </body>
+<script src="/js/auth-check.js"></script>
 <script>
+    const userId =
+        getLoginUserIdOrRedirect();
+ 
     document.querySelectorAll(".menu-button").forEach(button => {
         button.addEventListener("click", function(event) {
             event.preventDefault();
