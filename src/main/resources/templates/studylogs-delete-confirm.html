@@ -112,6 +112,13 @@ main {
     background-color: #a59aca;
     color: #001e43;
 }
+
+.error-message {
+    color: #d93636;
+    font-weight: bold;
+    text-align: center;
+    min-height: 24px;
+}
 </style>
 </head>
 
@@ -166,6 +173,8 @@ main {
 
     </div>
 
+    <p id="errorMessage" class="error-message"></p>
+
     <div class="button-area">
 
         <button
@@ -188,7 +197,11 @@ main {
 
 </main>
 
+<script src="/js/auth-check.js"></script>
 <script>
+const userId =
+    getLoginUserIdOrRedirect();
+
 const deleteData =
     JSON.parse(sessionStorage.getItem("selectedStudyLog"));
 
@@ -232,7 +245,7 @@ document.getElementById("backButton")
         location.href = backPage;
     });
 
-document.getElementById("deleteButton")
+    document.getElementById("deleteButton")
     .addEventListener("click", async function() {
 
         const confirmed =
@@ -242,29 +255,43 @@ document.getElementById("deleteButton")
             return;
         }
 
+        const errorMessage =
+            document.getElementById("errorMessage");
+
+        errorMessage.textContent = "";
+
         try {
 
             const response =
                 await fetch(
-                    `/studylogs/${deleteData.userId}/${deleteData.id}`,
+                    `/studylogs/${encodeURIComponent(userId)}/${deleteData.id}`,
                     {
                         method: "DELETE"
                     }
                 );
 
             if (!response.ok) {
-                throw new Error("削除に失敗しました");
+
+                const errorData =
+                    await response.json();
+
+                throw new Error(
+                    errorData.message || "削除に失敗しました"
+                );
             }
 
             alert("削除しました。");
+
+            sessionStorage.removeItem("selectedStudyLog");
 
             location.href = "/studylogs-page";
 
         } catch(error) {
 
-            console.error(error);
+            errorMessage.textContent =
+                error.message;
 
-            alert(error.message);
+            console.error(error);
         }
     });
 </script>

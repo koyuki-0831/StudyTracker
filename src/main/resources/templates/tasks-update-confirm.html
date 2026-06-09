@@ -73,7 +73,7 @@ main {
     white-space: pre-wrap;
 }
 
-.eeror-message {
+.error-message {
     color: #d93636;
     font-weight: bold;
     min-height: 24px;
@@ -175,7 +175,11 @@ main {
     </div>
 </main>
 
+<script src="/js/auth-check.js"></script>
 <script>
+const userId =
+    getLoginUserIdOrRedirect();
+
 const updateTaskData = 
     JSON.parse(sessionStorage.getItem("updateTaskData"));
 
@@ -228,7 +232,7 @@ document.getElementById("backButton")
 document.getElementById("updateButton")
     .addEventListener("click", function() {
 
-        fetch(`/tasks/${updateTaskData.userId}/${updateTaskData.id}`, {
+        fetch(`/tasks/${encodeURIComponent(userId)}/${updateTaskData.id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -242,9 +246,14 @@ document.getElementById("updateButton")
                 visibility: updateTaskData.visibility
             })
         })
-        .then(response => {
+        .then(async response => {
             if(!response.ok) {
-                throw new Error("更新に失敗しました");
+                const errorData =
+                    await response.json();
+
+            throw new Error(
+                errorData.message || "更新に失敗しました"
+                    );
             }
             return response.json();
         })

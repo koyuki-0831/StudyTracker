@@ -15,6 +15,8 @@
         border-bottom: 2px solid #001e43 ; 
         padding: 16px;
         box-sizing: border-box;
+
+        position: relative;
     }
     
     .app-header-title {
@@ -26,10 +28,45 @@
         text-align: left;
         margin: 0;
     }
+
+    .login-user-area {
+        position: absolute;
+
+        right: 24px;
+        bottom: 12px;
+
+        font-size: 14px;
+        font-weight: bold;
+
+        color: #001e43;
+    }
 </style>
 <header class="app-header">
     <h1 class="app-header-title">StudyTracker</h1>
+
+    <div class="login-user-area">
+        <span id="loginUsername"></span>
+    </div>
+
 </header>
-</biv>
+<script>
+
+    window.addEventListener("DOMContentLoaded", () => {
+    
+        const loginUser =
+            JSON.parse(
+                sessionStorage.getItem("loginUser")
+            );
+    
+        if(loginUser) {
+    
+            document.getElementById("loginUsername")
+                .textContent =
+                    `👤 ${loginUser.username} さん`;
+        }
+    });
+    
+    </script>
+</div>
 </body>
 </html>

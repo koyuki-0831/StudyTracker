@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,8 +25,8 @@ public class StudyLogService {
 	private final StudyLogRepository studyLogRepository;
 	private final TasksRepository tasksRepository;
 	
-	public StudyLogService(StudyLogRepository studyLogREpository,
-							TasksRepository taskksRepository, StudyLogRepository studyLogRepository, TasksRepository tasksRepository) {
+	public StudyLogService(StudyLogRepository studyLogRepository,
+							TasksRepository taskksRepository, TasksRepository tasksRepository) {
 		this.studyLogRepository = studyLogRepository;
 		this.tasksRepository = tasksRepository;
 	}
@@ -35,8 +36,8 @@ public class StudyLogService {
 	//==================================
 	@Transactional
 	public StudyLogResponseDto create(String userId, long taskId, StudyLogRequestDto dto) {
-		 TasksModel task = tasksRepository.findById(taskId)
-				 .orElseThrow(() -> new RuntimeException("Task not found"));
+		TasksModel task = tasksRepository.findById(taskId)
+		        .orElseThrow(() -> new IllegalArgumentException("Taskが存在しません"));
 		 
 		 StudyLogModel log = new StudyLogModel();
 		 log.setUserId(userId);
@@ -56,8 +57,6 @@ public class StudyLogService {
 		 
 		 log.setCreated_at(LocalDateTime.now());
 		 log.setUpdate_date(LocalDateTime.now());
-		 
-		 log.setStatus(dto.getStatus());
 
 		 if("完了".equals(dto.getStatus())) {
 		     log.setFinishDate(LocalDate.now());
@@ -84,10 +83,10 @@ public class StudyLogService {
 	    System.out.println("dto.comprehensionLevel=" + dto.getComprehensionLevel());
 
 	    StudyLogModel log = studyLogRepository.findById(id)
-	            .orElseThrow(() -> new RuntimeException("StudyLog not found"));
+	            .orElseThrow(() -> new IllegalArgumentException("StudyLogが存在しません"));
 
 	    if (!log.getUserId().equals(userId)) {
-	        throw new RuntimeException("更新権限がありません");
+	    	throw new IllegalArgumentException("他人の学習記録は更新できません");
 	    }
 
 	    if (dto.getStudyMethod() != null) log.setStudyMethod(dto.getStudyMethod());
@@ -122,12 +121,14 @@ public class StudyLogService {
 	// 🔹 一覧取得（ページリング）
 	//============================
 	public Page<StudyLogResponseDto> getLogs(String userId, int page, int size){
-		
-		Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-		
-		Page<StudyLogModel> logs = studyLogRepository.findByUserId(userId,pageable);
-		
-		return logs.map(this::toDto);
+
+	    Pageable pageable =
+	            PageRequest.of(page, size, Sort.by("id").descending());
+
+	    Page<StudyLogModel> logs =
+	            studyLogRepository.findVisibleLogs(userId, pageable);
+
+	    return logs.map(this::toDto);
 	}
 	
 	//===================================
@@ -174,11 +175,11 @@ public class StudyLogService {
 	public void delete(String userId, Long id) {
 		
 		StudyLogModel log = studyLogRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("StudyLog not found"));
+		        .orElseThrow(() -> new IllegalArgumentException("StudyLogが存在しません"));
 		
 		//所有者チェック
 		if(!log.getUserId().equals(userId)) {
-			throw new RuntimeException("削除権限がありません");
+			throw new IllegalArgumentException("他人の学習記録は削除できません");
 		}
 		
 		studyLogRepository.delete(log);
@@ -240,9 +241,15 @@ public class StudyLogService {
 	// 🔹 フォーマット系
 	//======================================
 	private String formatDuration(Integer minutes) {
-		int h = minutes / 60;
-		int m = minutes % 60;
-		return h > 0 ? h + "時間" + m + "分" : m + "分";
+
+	    if(minutes == null || minutes < 0) {
+	        return "0分";
+	    }
+
+	    int h = minutes / 60;
+	    int m = minutes % 60;
+
+	    return h > 0 ? h + "時間" + m + "分" : m + "分";
 	}
 	
 	private String formatTotalTime(Integer minutes) {
@@ -255,18 +262,24 @@ public class StudyLogService {
 	}
 	
 	private String formatUnderstanding(Integer level) {
-		return "★★★★★".substring(0, level) + "☆☆☆☆☆".substring(0, 5 - level);		
+
+	    int lv = level == null ? 0 : level;
+
+	    lv = Math.max(0, Math.min(5, lv));
+
+	    return "★★★★★".substring(0, lv)
+	            + "☆☆☆☆☆".substring(0, 5 - lv);
 	}
 	
+	private static final DateTimeFormatter DATE_FORMATTER =
+	        DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	
 	private String formatFinishDate(StudyLogModel log) {
-		
-		if(log.getUpdate_date() != null) {
-			return log.getUpdate_date().toLocalTime().toString();
-		}
-		
-		if(log.getCreated_at() != null) {
-			return log.getCreated_at().toLocalTime().toString();
-		}
-		return "-";
+
+	    if(log.getFinishDate() == null) {
+	        return "-";
+	    }
+
+	    return log.getFinishDate().format(DATE_FORMATTER);
 	}
 	}

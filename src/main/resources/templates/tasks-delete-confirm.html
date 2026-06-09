@@ -187,7 +187,11 @@ main {
     </div>
 </main>
 
+<script src="/js/auth-check.js"></script>
 <script>
+const userId =
+    getLoginUserIdOrRedirect();
+
 const selectedTask =
     JSON.parse(sessionStorage.getItem("selectedTask"));
 
@@ -232,14 +236,18 @@ document.getElementById("confirmCreatedAt").textContent =
 document.getElementById("deleteButton")
     .addEventListener("click", function() {
 
-        fetch(`/tasks/${selectedTask.userId}/${selectedTask.id}`, {
+        fetch(`/tasks/${encodeURIComponent(userId)}/${selectedTask.id}`, {
             method: "DELETE"
         })
-        .then(response => {
+        .then(async response => {
             if(!response.ok){
-                throw new Error("削除に失敗しました");
-            }
+                const errorData =
+                    await response.json();
 
+                throw new Error(
+                    errorData.message || "削除に失敗しました"
+                );
+            }
             alert("削除しました");
 
             sessionStorage.removeItem("selectedTask");

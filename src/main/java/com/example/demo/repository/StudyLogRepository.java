@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +20,21 @@ public interface StudyLogRepository extends JpaRepository<StudyLogModel, Long> {
 	//=================================
 	
 	//ユーザー単位で一覧（ページリング）
+	@EntityGraph(attributePaths = "tasks")
 	Page<StudyLogModel> findByUserId(String userId, Pageable pageable);
+
+	// 自分の記録すべて + 他人のPUBLIC記録
+	@EntityGraph(attributePaths = "tasks")
+	@Query("""
+	    SELECT s FROM StudyLogModel s
+	    JOIN s.tasks t
+	    WHERE s.userId = :userId
+	       OR t.visibility = 'PUBLIC'
+	""")
+	Page<StudyLogModel> findVisibleLogs(
+	        @Param("userId") String userId,
+	        Pageable pageable
+	);
 	
 	//ユーザー単位で１件取得
 	Optional<StudyLogModel> findByUserId(String userId, int page, int size);

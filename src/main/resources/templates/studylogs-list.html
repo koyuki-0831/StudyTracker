@@ -230,6 +230,7 @@ main {
     
         <select id="sortBy">
             <option value="id">ID順</option>
+            <option value="userId">ユーザーID順</option>
             <option value="taskTitle">タスク名順</option>
             <option value="status">進行度順</option>
             <option value="priority">優先度順</option>
@@ -256,6 +257,7 @@ main {
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>ユーザーID</th>
                     <th>タスク名</th>
                     <th>進行度</th>
                     <th>優先度</th>
@@ -376,6 +378,8 @@ function renderStudyLogs(logs) {
 
         tr.innerHTML = `
             <td>${log.id ?? "-"}</td>
+
+            <td>${escapeHtml(log.userId ?? "-")}</td>
 
             <td>${escapeHtml(log.taskTitle ?? "-")}</td>
 

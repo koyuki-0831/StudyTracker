@@ -8,12 +8,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.dto.TasksRequestDto;
 import com.example.demo.dto.TasksResponseDto;
 import com.example.demo.model.TasksModel;
 import com.example.demo.repository.TasksRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class TasksService {
 	
@@ -58,6 +60,7 @@ public class TasksService {
 	}
 	
 	//------ 新規タスク作成 ---------- 
+	@Transactional
 	public TasksResponseDto createTasks(String userId,TasksRequestDto dto) {
 		
 		//バリデーション
@@ -71,6 +74,8 @@ public class TasksService {
 		model.setPriority(dto.getPriority());
 		model.setDue_date(dto.getDue_date());
 		model.setVisibility(dto.getVisibility());
+		// 新規作成時の初期値
+		model.setStatus("未着手");
 		
 		//デフォルト
 		if(model.getVisibility() == null || model.getVisibility().isBlank()) {
@@ -84,51 +89,48 @@ public class TasksService {
 	}
 	
 	//-------- タスク更新 ---------
-		public TasksResponseDto updateTasks(Long id, String userId, TasksRequestDto dto) {
-		
-		//対象取得(必ずIDで一意に)
-		TasksModel tasks = tasksRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("タスクが存在していません"));
-		
-		//所有者チェック
-		if(!Objects.equals(tasks.getUserId(), userId)) {
-			throw new IllegalArgumentException("他人のタスクは更新できません");
-		}
-			
-		
-		//バリデーション
-		validate(dto);
-		
-		// DTO → Model (上書き)
-		tasks.setTitle(dto.getTitle());
-		tasks.setDescription(dto.getDescription());
-		tasks.setStatus(dto.getStatus());
-		
-		if(dto.getStatus() == null || dto.getStatus().isBlank()) {
-			throw new IllegalArgumentException("進行度は必須です");
-		}
-		
-		if(!List.of("未着手", "進行中", "完了").contains(dto.getStatus())) {
-			throw new IllegalArgumentException("statusは 未着手 / 進行中 / 完了 のみです");
-		}
-		
-		tasks.setPriority(dto.getPriority());
-		tasks.setDue_date(dto.getDue_date());
-		tasks.setVisibility(dto.getVisibility());
-		
-		//念の為のvisibilityのデフォルト制御
-		if(tasks.getVisibility() == null || tasks.getVisibility().isBlank()) {
-			tasks.setVisibility("PUBLIC");
-		}
-		
-		
-		TasksModel saved = tasksRepository.save(tasks);
-		
-		//保存
-		return toResponseDto(saved);
+	@Transactional
+	public TasksResponseDto updateTasks(Long id, String userId, TasksRequestDto dto) {
+
+	    // 対象取得
+	    TasksModel tasks = tasksRepository.findById(id)
+	            .orElseThrow(() -> new IllegalArgumentException("タスクが存在していません"));
+
+	    // 所有者チェック
+	    if(!Objects.equals(tasks.getUserId(), userId)) {
+	        throw new IllegalArgumentException("他人のタスクは更新できません");
+	    }
+
+	    // バリデーション
+	    validate(dto);
+
+	    if(dto.getStatus() == null || dto.getStatus().isBlank()) {
+	        throw new IllegalArgumentException("進行度は必須です");
+	    }
+
+	    if(!List.of("未着手", "進行中", "完了").contains(dto.getStatus())) {
+	        throw new IllegalArgumentException("statusは 未着手 / 進行中 / 完了 のみです");
+	    }
+
+	    // DTO → Model
+	    tasks.setTitle(dto.getTitle());
+	    tasks.setDescription(dto.getDescription());
+	    tasks.setStatus(dto.getStatus());
+	    tasks.setPriority(dto.getPriority());
+	    tasks.setDue_date(dto.getDue_date());
+	    tasks.setVisibility(dto.getVisibility());
+
+	    if(tasks.getVisibility() == null || tasks.getVisibility().isBlank()) {
+	        tasks.setVisibility("PUBLIC");
+	    }
+
+	    TasksModel saved = tasksRepository.save(tasks);
+
+	    return toResponseDto(saved);
 	}
 	
 	//---------- タスク削除　----------
+	@Transactional
 	public void deleteTasks(Long id, String userId) {
 		 //存在チェック
 		TasksModel tasks = tasksRepository.findById(id) 

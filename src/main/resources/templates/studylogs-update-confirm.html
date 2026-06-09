@@ -221,7 +221,11 @@ main {
     </div>
 </main>
 
+<script src="/js/auth-check.js"></script>
 <script>
+const userId =
+    getLoginUserIdOrRedirect();
+
 const updateData =
     JSON.parse(sessionStorage.getItem("studyLogUpdateData"));
 
@@ -297,18 +301,22 @@ document.getElementById("updateButton")
         console.log("requestBody:", requestBody);
         console.log("url:", `/studylogs/${updateData.userId}/${updateData.id}`);
 
-        fetch(`/studylogs/${updateData.userId}/${updateData.id}`, {
+        fetch(`/studylogs/${encodeURIComponent(userId)}/${updateData.id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(requestBody)
         })
-        .then(response => {
+        .then(async response => {
             if (!response.ok) {
-                throw new Error("学習記録の更新に失敗しました");
-            }
+                const errorData =
+                    await response.json();
 
+                throw new Error(
+                    errorData.message || "学習記録の更新に失敗しました"
+                );
+            }
             return response.json();
         })
         .then(data => {
