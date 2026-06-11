@@ -117,17 +117,30 @@ main {
             <input type="password" id="password">
         </div>
 
+        <div id="registerLinkArea" class="register-link-area">
+            <span>アカウントをお持ちでない方は</span>
+            <a href="/register">こちら</a>
+        </div>
+
         <p id="errorMessage" class="error-message"></p>
 
         <button type="submit" class="menu-button">
             ログイン
         </button>
 
+
     </form>
 
 </main>
 
 <script>
+
+const params =
+    new URLSearchParams(window.location.search);
+
+if (params.get("from") === "register-confirm") {
+    document.getElementById("registerLinkArea").style.display = "none";
+}
 
 document.getElementById("loginForm")
     .addEventListener("submit", async function(event){
