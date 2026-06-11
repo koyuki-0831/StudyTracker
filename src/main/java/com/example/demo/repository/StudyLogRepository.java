@@ -37,7 +37,7 @@ public interface StudyLogRepository extends JpaRepository<StudyLogModel, Long> {
 	);
 	
 	//ユーザー単位で１件取得
-	Optional<StudyLogModel> findByUserId(String userId, int page, int size);
+	//Optional<StudyLogModel> findByUserId(String userId, int page, int size);
 	Optional<StudyLogModel> findByUserIdAndTasks_Id(String userId, Long taskId);
 	
 	//タスク単位で一覧
