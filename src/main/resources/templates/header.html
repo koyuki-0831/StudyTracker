@@ -1,72 +1,86 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>共通ヘッダー</title>
 
-</head>
-<body>
-<div th:fragment="header">
- <style>
-    .app-header {
-        width: 100%;
-        height: 70px;
-        background-color: #a59aca;
-        border-bottom: 2px solid #001e43 ; 
-        padding: 16px;
-        box-sizing: border-box;
+    <style>
+        .app-header {
+            width: 100%;
+            height: 70px;
 
-        position: relative;
-    }
-    
-    .app-header-title {
-        font-family: 'Times New Roman', Times, serif;
-        font-size: 30px;
-        -webkit-text-stroke: 0.7px #0f2350;
-        font-weight: bold;
-        color: white;
-        text-align: left;
-        margin: 0;
-    }
+            background-color: #a59aca;
+            border-bottom: 2px solid #001e43;
 
-    .login-user-area {
-        position: absolute;
+            padding: 16px;
+            box-sizing: border-box;
 
-        right: 24px;
-        bottom: 12px;
-
-        font-size: 14px;
-        font-weight: bold;
-
-        color: #001e43;
-    }
-</style>
-<header class="app-header">
-    <h1 class="app-header-title">StudyTracker</h1>
-
-    <div class="login-user-area">
-        <span id="loginUsername"></span>
-    </div>
-
-</header>
-<script>
-
-    window.addEventListener("DOMContentLoaded", () => {
-    
-        const loginUser =
-            JSON.parse(
-                sessionStorage.getItem("loginUser")
-            );
-    
-        if(loginUser) {
-    
-            document.getElementById("loginUsername")
-                .textContent =
-                    `👤 ${loginUser.username} さん`;
+            position: relative;
         }
-    });
-    
+
+        .app-header-title {
+            font-family: "Times New Roman", Times, serif;
+            font-size: 30px;
+            font-weight: bold;
+
+            color: white;
+            text-align: left;
+            margin: 0;
+
+            -webkit-text-stroke: 0.7px #0f2350;
+        }
+
+        .login-user-area {
+            position: absolute;
+
+            right: 24px;
+            bottom: 12px;
+
+            font-size: 14px;
+            font-weight: bold;
+
+            color: #001e43;
+        }
+    </style>
+</head>
+
+<body>
+
+<div th:fragment="header">
+
+    <header class="app-header">
+
+        <h1 class="app-header-title">
+            StudyTracker
+        </h1>
+
+        <div class="login-user-area">
+            <span id="loginUsername"></span>
+        </div>
+
+    </header>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+
+            const loginUser =
+                JSON.parse(
+                    sessionStorage.getItem("loginUser")
+                );
+
+            if (loginUser) {
+
+                document.getElementById("loginUsername")
+                    .textContent =
+                    `👤 ${loginUser.username} さん`;
+            }
+        });
     </script>
+
 </div>
+
 </body>
+
+</html>>
 </html>
